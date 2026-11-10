@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FISAC – Filiali Intesa Sanpaolo, BPER e MPS per regione</title>
+<link rel="icon" href="assets/logo.png">
+<style>
+:root{--red:#b3001b;--ink:#1c2230;--mute:#667085;--serif:Georgia,"Times New Roman",Times,serif}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font:16px/1.5 var(--serif);color:var(--ink)}
+body{background:linear-gradient(180deg,#fff 0%,#ffeaea 50%,#f8b4b4 100%);background-attachment:fixed}
+header{display:flex;align-items:center;gap:22px;padding:14px 28px;border-bottom:3px solid var(--red);background:#fff}
+header img{height:64px;width:auto}
+header h1{font-size:23px;margin:0;line-height:1.2;font-weight:700;letter-spacing:.01em}
+header p{margin:3px 0 0;color:var(--mute);font-size:14px;font-style:italic}
+main{max-width:1120px;margin:0 auto;padding:20px 20px 40px;display:grid;grid-template-columns:minmax(300px,480px) 1fr;gap:32px;align-items:start}
+.mapbox{position:relative}
+svg{width:100%;height:auto;display:block}
+.reg{-webkit-tap-highlight-color:rgba(179,0,27,.25)}
+.reg path{fill:#fff;stroke:#b3001b;stroke-width:1.1;stroke-linejoin:round;transition:fill .15s}
+.reg:hover path,.reg:focus path{fill:#b3001b}
+#tip{position:absolute;pointer-events:none;background:#1c2230;color:#fff;padding:6px 10px;border-radius:8px;font-size:13px;line-height:1.5;display:none;white-space:nowrap;z-index:2}
+#tip b{font-size:14px}
+.i{color:#15803d}.b{color:#7c3aed}.m{color:#2563eb}.y{color:#a16207}
+.card{background:rgba(255,255,255,.88);border-radius:12px;padding:14px 16px;margin-bottom:16px}
+.tot{display:flex;gap:22px;flex-wrap:wrap}
+.tot div{font-size:13px;color:var(--mute)}.tot b{display:block;font-size:26px}
+table{width:100%;border-collapse:collapse;font-size:14.5px}
+th{text-align:left;font-size:12.5px;color:var(--mute);padding:4px 6px;border-bottom:1px solid #e3b4b4;font-weight:400;font-style:italic}
+th.n,td.n{text-align:right}
+td{padding:4px 6px;border-bottom:1px solid rgba(179,0,27,.12)}
+td a{color:var(--ink);text-decoration:none;font-weight:700}td a:hover{color:var(--red);text-decoration:underline}
+.note{font-size:13px;color:var(--mute);font-style:italic}
+footer{text-align:center;font-size:12.5px;color:#7a2a2a;padding:0 20px 24px;font-style:italic}
+@media(max-width:820px){main{grid-template-columns:1fr}header img{height:46px}header h1{font-size:19px}}
+</style>
+</head>
+<body>
+<header>
+  <img src="assets/logo.png" alt="FISAC CGIL">
+  <div><h1>Filiali Intesa Sanpaolo, BPER e Monte dei Paschi di Siena</h1><p>Mappe per regione: seleziona una regione per vedere le filiali e le sovrapposizioni sul territorio</p></div>
+</header>
+<main>
+  <div class="mapbox">
+    <svg viewBox="0 0 __W__ __H__" role="img" aria-label="Mappa schematica dell'Italia divisa per regioni">__SVG__</svg>
+    <div id="tip"></div>
+  </div>
+  <div>
+    <div class="card">
+      <div class="tot"><div><b class="i">__TI__</b>Intesa Sanpaolo</div><div><b class="b">__TB__</b>BPER Banca*</div><div><b class="m">__TM__</b>Monte dei Paschi</div><div><b class="y">__TO__</b>comuni con 2+ banche</div></div>
+    </div>
+    <div class="card">
+      <table><thead><tr><th>Regione</th><th class="n i">ISP</th><th class="n b">BPER</th><th class="n m">MPS</th><th class="n y">Comuni 2+ banche</th></tr></thead><tbody>__ROWS__</tbody></table>
+    </div>
+    <p class="note">Dati rilevati il __DATE__. Intesa Sanpaolo e MPS: locator ufficiali delle banche. *BPER: il locator ufficiale è protetto da reCAPTCHA, quindi i dati provengono da OpenStreetMap e l'elenco è incompleto. Le sedi specializzate (filiali imprese, private banking) sono incluse nei totali; nelle mappe si possono escludere.</p>
+  </div>
+</main>
+<footer>Mappa schematica semplificata · confini ISTAT da openpolis/geojson-italy</footer>
+<script>
+const tip=document.getElementById('tip'),box=document.querySelector('.mapbox');
+if(window.matchMedia('(hover:hover)').matches)document.querySelectorAll('a.reg').forEach(a=>{
+  const show=e=>{tip.innerHTML=`<b>${a.dataset.n}</b><br><span style="color:#86efac">ISP ${a.dataset.i}</span> · <span style="color:#c4b5fd">BPER ${a.dataset.b}</span> · <span style="color:#93c5fd">MPS ${a.dataset.m}</span><br><span style="color:#fde047">comuni con 2+ banche: ${a.dataset.o}</span>`;tip.style.display='block';const r=box.getBoundingClientRect();tip.style.left=Math.min(e.clientX-r.left+14,r.width-230)+'px';tip.style.top=(e.clientY-r.top+14)+'px'};
+  a.addEventListener('mousemove',show);a.addEventListener('mouseleave',()=>tip.style.display='none');
+});
+</script>
+</body>
+</html>

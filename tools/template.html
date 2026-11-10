@@ -65,16 +65,13 @@ button.act{border:1px solid var(--line);background:#fff;border-radius:6px;paddin
   <div class="head">
     <a class="back" href="../"><img src="../assets/logo.png" alt="FISAC CGIL"><span>← Tutte le regioni</span></a>
     <h1>Filiali in __REG__</h1>
-    <div class="sub">Intesa Sanpaolo, BPER Banca e Banca Monte dei Paschi di Siena · dati rilevati il __DATE__</div>
+    <div class="sub">Intesa Sanpaolo, BPER Banca e Banca Monte dei Paschi di Siena · elenco sportelli Banca d'Italia al __DATE__</div>
   </div>
   <div class="ctrl">
     <div class="row">
       <label><input type="checkbox" id="cISP" checked><span class="dot" style="background:var(--isp)"></span>Intesa Sanpaolo</label>
       <label><input type="checkbox" id="cBPER" checked><span class="dot" style="background:var(--bper)"></span>BPER</label>
       <label><input type="checkbox" id="cMPS" checked><span class="dot" style="background:var(--mps)"></span>MPS</label>
-    </div>
-    <div class="row">
-      <label title="Esclude filiali imprese, private banking e altri sportelli specializzati"><input type="checkbox" id="cSpec">Solo filiali retail</label>
     </div>
     <div class="row">
       <select id="selProv"><option value="">Tutte le province</option></select>
@@ -95,7 +92,7 @@ button.act{border:1px solid var(--line);background:#fff;border-radius:6px;paddin
   <div class="tablewrap"><table id="tbl"><thead><tr>
     <th data-s="n">Comune</th><th data-s="p">Pr.</th><th class="n" data-s="ISP" style="color:var(--isp)">ISP</th><th class="n" data-s="BPER" style="color:var(--bper)">BPER</th><th class="n" data-s="MPS" style="color:var(--mps)">MPS</th><th data-s="st">Stato</th>
   </tr></thead><tbody></tbody></table></div>
-  <div class="foot">Colore comune: <span style="color:#ca8a04">■</span> 2 banche · <span style="color:#ea580c">■</span> 3 banche · verde/viola/blu = una sola banca · grigio = nessuna filiale. Linee rosse: coppie di banche diverse entro il raggio. Fonti: locator Intesa Sanpaolo e MPS; BPER da OpenStreetMap (elenco incompleto). Confini ISTAT (openpolis).</div>
+  <div class="foot">Colore comune: <span style="color:#ca8a04">■</span> 2 banche · <span style="color:#ea580c">■</span> 3 banche · verde/viola/blu = una sola banca · grigio = nessuna filiale. Linee rosse: coppie di banche diverse entro il raggio (solo sedi con posizione esatta). Cerchio tratteggiato: sedi senza posizione esatta, collocate al centro del comune. Elenco sportelli: Banca d'Italia, aggiornato al __DATE__. Posizioni sulla mappa ricavate dagli indirizzi (alcune approssimative). Confini ISTAT (openpolis).</div>
 </aside>
 <div id="map"></div>
 </div>
@@ -124,8 +121,8 @@ legend.onAdd=()=>{const d=L.DomUtil.create('div','legend');d.innerHTML=BK.map(k=
 legend.addTo(map);
 Object.entries(PROVN).sort((a,b)=>a[1].localeCompare(b[1])).forEach(([k,v])=>$('selProv').insertAdjacentHTML('beforeend',`<option value="${k}">${esc(v)}</option>`));
 const hav=(a,b)=>{const R=6371000,r=Math.PI/180,dl=(b.lat-a.lat)*r,dn=(b.lon-a.lon)*r,x=Math.sin(dl/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(x))};
-function active(){return D.br.filter(b=>$('c'+b.b).checked&&!($('cSpec').checked&&b.spec))}
-function popup(b){return `<div class=pop><b>${esc(b.nome)}</b><div class=m>${BN[b.b]}${b.marchio?' · '+esc(b.marchio):''}</div>${esc(b.ind)}${b.cap?' – '+esc(b.cap):''}<br>${esc(b.com)} (${b.prov})<div class=m>${esc(b.tip)}${b.tel?' · tel. '+esc(b.tel):''}</div></div>`}
+function active(){return D.br.filter(b=>$('c'+b.b).checked)}
+function popup(b){return `<div class=pop><b>${esc(b.nome)}</b><div class=m>${BN[b.b]}${b.marchio?' · '+esc(b.marchio):''}</div>${esc(b.ind)}${b.cap?' – '+esc(b.cap):''}<br>${esc(b.com)} (${b.prov})<div class=m>${esc(b.tip)} · cod. ${esc(b.cod)}${b.a?' · <i>posizione approssimativa</i>':''}</div></div>`}
 function refresh(){
   const act=active(),R=+$('rad').value;$('rv').textContent=R;
   counts={};
@@ -133,13 +130,17 @@ function refresh(){
   act.forEach(b=>{const c=counts[b.com];if(c)c[b.b]++});
   Object.values(counts).forEach(c=>{const pres=BK.filter(k=>c[k]>0);c.k=pres.length;c.only=pres[0];c.pres=pres});
   brLayer.clearLayers();
-  act.forEach(b=>{L.circleMarker([b.lat,b.lon],{radius:b.spec?4.5:6,weight:1.5,color:'#fff',fillColor:BC[b.b],fillOpacity:.95}).bindPopup(popup(b)).bindTooltip(`${b.nome} (${BN[b.b]})`).addTo(brLayer)});
+  const exact=act.filter(b=>!b.a),aprx=act.filter(b=>b.a);
+  exact.forEach(b=>{L.circleMarker([b.lat,b.lon],{radius:6,weight:1.5,color:'#fff',fillColor:BC[b.b],fillOpacity:.95}).bindPopup(popup(b)).bindTooltip(`${b.nome} (${BN[b.b]})`).addTo(brLayer)});
+  const grp={};aprx.forEach(b=>{const k=b.com+'|'+b.b;(grp[k]=grp[k]||[]).push(b)});
+  Object.values(grp).forEach(g=>{const b=g[0],off={ISP:[0,-.004],BPER:[-.004,.003],MPS:[.004,.003]}[b.b];
+    L.circleMarker([b.lat+off[1]*.8,b.lon+off[0]],{radius:7,weight:2,color:BC[b.b],dashArray:'3 3',fillColor:BC[b.b],fillOpacity:.15}).bindPopup(`<div class=pop><b>${esc(b.com)} – ${BN[b.b]}</b><div class=m>${g.length} ${g.length>1?'sedi':'sede'} · posizione esatta non disponibile (punto al centro del comune)</div>${g.map(x=>esc(x.ind)).join('<br>')}</div>`).bindTooltip(`${BN[b.b]}: ${g.length} ${g.length>1?'sedi':'sede'} a ${esc(b.com)} (posizione approssimativa)`).addTo(brLayer)});
   pairLayer.clearLayers();let pairs=0;
-  if(R>0)for(let i=0;i<act.length;i++)for(let j=i+1;j<act.length;j++){const a=act[i],c=act[j];if(a.b===c.b)continue;if(Math.abs(a.lat-c.lat)>R/111000+.001)continue;const d=hav(a,c);if(d<=R){pairs++;
+  if(R>0)for(let i=0;i<exact.length;i++)for(let j=i+1;j<exact.length;j++){const a=exact[i],c=exact[j];if(a.b===c.b)continue;if(Math.abs(a.lat-c.lat)>R/111000+.001)continue;const d=hav(a,c);if(d<=R){pairs++;
     L.polyline([[a.lat,a.lon],[c.lat,c.lon]],{color:'#dc2626',weight:2.5,opacity:.9}).bindTooltip(`${a.nome} (${a.b}) ↔ ${c.nome} (${c.b}): ${Math.round(d)} m`).addTo(pairLayer)}}
   const all=Object.values(counts),w=all.filter(c=>c.k>0).length,k2=all.filter(c=>c.k>=2).length,k3=all.filter(c=>c.k===3).length;
   const n=k=>act.filter(b=>b.b===k).length;
-  $('stats').innerHTML=BK.map(k=>`<div class=stat><b style="color:${BC[k]}">${n(k)}</b><span>${BN[k]}</span></div>`).join('')+`<div class=stat><b style="color:#ca8a04">${k2}</b><span>comuni con 2+ banche (su ${w})</span></div><div class=stat><b style="color:#ea580c">${k3}</b><span>comuni con tutte e 3</span></div><div class=stat><b style="color:#dc2626">${pairs}</b><span>coppie entro ${R} m</span></div>`;
+  $('stats').innerHTML=BK.map(k=>`<div class=stat><b style="color:${BC[k]}">${n(k)}</b><span>${BN[k]}</span></div>`).join('')+`<div class=stat><b style="color:#ca8a04">${k2}</b><span>comuni con 2+ banche (su ${w})</span></div><div class=stat><b style="color:#ea580c">${k3}</b><span>comuni con tutte e 3</span></div><div class=stat><b style="color:#dc2626">${pairs}</b><span>coppie entro ${R} m (sedi con posizione esatta)</span></div>`;
   comLayer.eachLayer(l=>{});
   renderTable();showInfo($('selProv').value);
 }
@@ -167,7 +168,7 @@ function selectComune(n){selected=n;const l=comByName[n];if(!l)return;map.fitBou
 document.querySelector('#tbl tbody').addEventListener('click',e=>{const tr=e.target.closest('tr.c');if(tr){selectComune(tr.dataset.n);focusMap()}});
 document.querySelectorAll('th[data-s]').forEach(th=>th.onclick=()=>{const k=th.dataset.s;sortDir=sortKey===k?-sortDir:1;sortKey=k;renderTable()});
 document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#seg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');view=b.dataset.v;renderTable()});
-['cISP','cBPER','cMPS','cSpec'].forEach(id=>$(id).onchange=refresh);$('rad').oninput=refresh;
+['cISP','cBPER','cMPS'].forEach(id=>$(id).onchange=refresh);$('rad').oninput=refresh;
 $('selProv').onchange=()=>{renderTable();showInfo($('selProv').value);if($('selProv').value)focusMap();const p=$('selProv').value;if(p){const ls=[];comLayer.eachLayer(l=>l.feature.properties.p===p&&ls.push(l));map.fitBounds(L.featureGroup(ls).getBounds())}else map.fitBounds(FULL)};
 $('q').oninput=renderTable;
 $('csv').onclick=()=>{const rows=visible().sort((a,b)=>a.p.localeCompare(b.p)||a.n.localeCompare(b.n));

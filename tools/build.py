@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Genera le mappe regionali (<regione>/index.html) e la pagina d'accesso (index.html).
 Uso: python3 build.py <cartella_dati> [cartella_output]
-Cartella dati: isp_raw.json, mps_raw.json (crawl.py), osm_bper.json (Overpass), prov.geojson, g/com1..20.geojson"""
+Cartella dati: prov.geojson, g/com1..20.geojson (confini). Sedi: tools/data/csv/*.csv (Banca d'Italia) e tools/data/geocode.json (geocode.py)"""
 import re,json,sys,os,unicodedata,collections,datetime,math
 DATA=sys.argv[1];HERE=os.path.dirname(os.path.abspath(__file__));ROOT=os.path.abspath(sys.argv[2] if len(sys.argv)>2 else os.path.join(HERE,'..'))
 TODAY=datetime.date.today().strftime('%d/%m/%Y')
@@ -47,26 +47,17 @@ def inside(x,y,g,bb):
     if not(bb[0]<=x<=bb[2] and bb[1]<=y<=bb[3]):return False
     return any(pip(x,y,p[0]) and not any(pip(x,y,hh) for hh in p[1:]) for p in g['coordinates'])
 tt=lambda s:(s or '').strip().title().replace("'S ","'s ")
-# ---------- normalizzazione sedi ----------
+# ---------- sedi dai CSV Banca d'Italia + coordinate (geocode.json) ----------
+sys.path.insert(0,HERE)
+from common import read_csv,cname
+GEO=json.load(open(f'{HERE}/data/geocode.json'))
 raw=[]
-for x in json.load(open(f'{DATA}/isp_raw.json')):
-    if x['abi'] not in ('03069','03239'):continue   # esclusa Fideuram
-    c1=x.get('categoria1');pb=x['abi']=='03239'
-    name=(x.get('datiSoa') or {}).get('descrizioneFiliale') or x['comune']
-    raw.append(dict(b='ISP',nome=tt(name),ind=tt(x['indirizzo']),cap=x.get('cap') or '',tel=x.get('numeroTelefono'),lat=x['latitudine'],lon=x['longitudine'],comd=x['comune'],provd=x.get('codiceProvincia'),cod=x['chiave'],
-        tip='Private Banking' if pb else ('Filiale imprese' if c1=='Filiale Imprese' else 'Altro sportello' if c1=='Altro' else 'Filiale'),spec=pb or c1 in ('Filiale Imprese','Altro'),marchio='Private Banking' if pb else ''))
-for x in json.load(open(f'{DATA}/mps_raw.json')):
-    e=x['entitaBanca'][0]
-    raw.append(dict(b='MPS',nome=tt(e.get('descrizioneFiliale') or x['comune']),ind=tt(x['indirizzo']),cap=x.get('cap') or '',tel=x.get('telefono'),lat=x['latitudine'],lon=x['longitudine'],comd=x['comune'],provd=x.get('provincia'),cod=str(e.get('codiceFiliale')),tip='Filiale',spec=False,marchio=''))
-seen=set()
-for e in json.load(open(f'{DATA}/osm_bper.json'))['elements']:
-    t=e['tags'];lat=e.get('lat') or e['center']['lat'];lon=e.get('lon') or e['center']['lon']
-    k=(round(lat,3),round(lon,3))
-    if k in seen:continue
-    seen.add(k)
-    ind=((t.get('addr:street') or '')+(' '+t['addr:housenumber'] if t.get('addr:housenumber') else '')).strip()
-    raw.append(dict(b='BPER',nome=tt(t.get('name') or 'BPER Banca')+(' – '+t['addr:city'] if t.get('addr:city') else ''),ind=ind or '(indirizzo non indicato)',cap=t.get('addr:postcode') or '',tel=t.get('phone') or t.get('contact:phone'),lat=lat,lon=lon,comd=t.get('addr:city') or '',provd=None,cod=f"osm-{e['type'][0]}{e['id']}",tip='Filiale',spec=False,marchio=(t.get('brand') if t.get('brand') and 'BPER' not in t.get('brand','').upper() else '')))
-print('sedi grezze',collections.Counter(r['b'] for r in raw))
+for b,fn in (('ISP','intesa'),('BPER','bper'),('MPS','mps')):
+    for r in read_csv(f'{HERE}/data/csv/{fn}.csv'):
+        k='|'.join([r['CODICE MECCANOGRAFICO INTERMEDIARIO'],r['CODICE SUCCURSALE'],r['CAP'],r['INDIRIZZO']]);g=GEO.get(k)
+        city=r["CITTA'"].strip().title();fr=r['FRAZIONE'].strip().title()
+        raw.append(dict(b=b,nome=city+(' – '+fr if fr else ''),ind=tt(r['INDIRIZZO']),cap=r['CAP'],tel='',lat=g[0] if g else None,lon=g[1] if g else None,prec=(g[2] if g else None),comd=r["CITTA'"],provd=None,cod=r['CODICE SUCCURSALE'],tip='Filiale',spec=False,marchio=''))
+print('sedi dai CSV',collections.Counter(r['b'] for r in raw),'senza coordinate',sum(r['lat'] is None for r in raw))
 # ---------- confini ----------
 prov=json.load(open(f'{DATA}/prov.geojson'))['features']
 REG=[]
@@ -77,18 +68,28 @@ for code in range(1,21):
         g=geom(f['geometry']);cf.append({'type':'Feature','properties':{'n':f['properties']['name'],'p':f['properties']['prov_acr'],'k':norm(f['properties']['name'])},'geometry':g});bbs.append(bbox(g))
     rb=(min(b[0] for b in bbs),min(b[1] for b in bbs),max(b[2] for b in bbs),max(b[3] for b in bbs))
     REG.append(dict(code=code,rname=rname,cf=cf,bbs=bbs,rb=rb,PROVN={f['properties']['prov_acr']:f['properties']['prov_name'] for f in com},br=[]))
-unm=collections.Counter()
+unm=collections.Counter();approx=collections.Counter()
+byname=collections.defaultdict(list)
+for R in REG:
+    for f,bb in zip(R['cf'],R['bbs']):byname[f['properties']['k']].append((R,f,bb))
 for r in raw:
     done=False
-    for R in REG:
-        rb=R['rb']
-        if not(rb[0]<=r['lon']<=rb[2] and rb[1]<=r['lat']<=rb[3]):continue
-        for f,bb in zip(R['cf'],R['bbs']):
-            if inside(r['lon'],r['lat'],f['geometry'],bb):
-                r['com']=f['properties']['n'];r['prov']=f['properties']['p'];R['br'].append(r);done=True;break
-        if done:break
-    if not done:unm[r['b']]+=1
-print('sedi fuori da ogni comune (scartate):',dict(unm))
+    if r['lat'] is not None:
+        for R in REG:
+            rb=R['rb']
+            if not(rb[0]<=r['lon']<=rb[2] and rb[1]<=r['lat']<=rb[3]):continue
+            for f,bb in zip(R['cf'],R['bbs']):
+                if inside(r['lon'],r['lat'],f['geometry'],bb):
+                    r['com']=f['properties']['n'];r['prov']=f['properties']['p'];R['br'].append(r);done=True;break
+            if done:break
+    if not done:
+        # coordinate assenti o fuori comune: uso il nome del comune (se univoco) e il centro del comune
+        c=byname.get(cname(r['comd']),[])
+        if len(c)==1:
+            R,f,bb=c[0];r['com']=f['properties']['n'];r['prov']=f['properties']['p'];r['lon']=round((bb[0]+bb[2])/2,5);r['lat']=round((bb[1]+bb[3])/2,5);r['prec']='city';R['br'].append(r);done=True
+    if not done:unm[(r['b'],r['comd'])]+=1
+    elif r.get('prec') in ('city',None):approx[r['b']]+=1;r['a']=1
+print('sedi senza comune riconosciuto (scartate):',sum(unm.values()),list(unm.items())[:12]);print('posizione approssimativa:',dict(approx))
 KEY={"Valle d'Aosta/Vallée d'Aoste":("Valle d'Aosta",'valle-d-aosta'),'Trentino-Alto Adige/Südtirol':('Trentino-Alto Adige','trentino-alto-adige')}
 regs=json.load(open(f'{DATA}/g/../regions.geojson'))['features'] if os.path.exists(f'{DATA}/regions.geojson') else json.load(open(f'{HERE}/data/regions.geojson'))['features']
 regf={f['properties']['reg_name']:f for f in regs}
@@ -96,7 +97,7 @@ summary=[]
 for R in REG:
     rname,slug=KEY.get(R['rname'],(R['rname'],re.sub(r'[^a-z]+','-',unicodedata.normalize('NFKD',R['rname'].lower()).encode('ascii','ignore').decode()).strip('-')))
     pf=[{'type':'Feature','properties':{'p':f['properties']['prov_acr'],'n':f['properties']['prov_name']},'geometry':geom(f['geometry'])} for f in prov if f['properties']['reg_name']==R['rname']]
-    br=[{k:v for k,v in b.items() if k not in('comd','provd')} for b in R['br']]
+    br=[{k:v for k,v in b.items() if k not in('comd','provd','prec','tel','marchio','spec','a') or (k=='a')} for b in R['br']]
     cnt=collections.defaultdict(set)
     for b in br:cnt[b['com']].add(b['b'])
     k2=sum(len(v)>=2 for v in cnt.values());k3=sum(len(v)==3 for v in cnt.values())

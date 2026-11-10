@@ -13,5 +13,6 @@ Settings → Pages → *Deploy from a branch* → `main` / `(root)`. I link sono
 ## Aggiornare / completare le posizioni
 ```
 python3 tools/geocode.py     # riprende la geocodifica (Nominatim, ~1 richiesta/s) delle sedi senza coordinate
+GEOAPIFY_KEY=... python3 tools/geocode_geoapify.py   # facoltativo: riprova con Geoapify le sedi non trovate (attribuzione: © Geoapify, © OpenStreetMap contributors)
 python3 tools/build.py <cartella_confini>   # rigenera le pagine (serve prov.geojson e g/com1..20.geojson)
 ```

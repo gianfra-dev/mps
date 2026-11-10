@@ -56,7 +56,7 @@ for b,fn in (('ISP','intesa'),('BPER','bper'),('MPS','mps')):
     for r in read_csv(f'{HERE}/data/csv/{fn}.csv'):
         k='|'.join([r['CODICE MECCANOGRAFICO INTERMEDIARIO'],r['CODICE SUCCURSALE'],r['CAP'],r['INDIRIZZO']]);g=GEO.get(k)
         city=r["CITTA'"].strip().title();fr=r['FRAZIONE'].strip().title()
-        raw.append(dict(b=b,nome=city+(' – '+fr if fr else ''),ind=tt(r['INDIRIZZO']),cap=r['CAP'],tel='',lat=g[0] if g else None,lon=g[1] if g else None,prec=(g[2] if g else None),comd=r["CITTA'"],provd=None,cod=r['CODICE SUCCURSALE'],tip='Filiale',spec=False,marchio=''))
+        raw.append(dict(k=k,b=b,nome=city+(' – '+fr if fr else ''),ind=tt(r['INDIRIZZO']),cap=r['CAP'],tel='',lat=g[0] if g else None,lon=g[1] if g else None,prec=(g[2] if g else None),comd=r["CITTA'"],provd=None,cod=r['CODICE SUCCURSALE'],tip='Filiale',spec=False,marchio=''))
 print('sedi dai CSV',collections.Counter(r['b'] for r in raw),'senza coordinate',sum(r['lat'] is None for r in raw))
 # ---------- confini ----------
 prov=json.load(open(f'{DATA}/prov.geojson'))['features']
@@ -94,6 +94,7 @@ for r in raw:
             R,f,bb=c[0];r['com']=f['properties']['n'];r['prov']=f['properties']['p'];r['lon']=round((bb[0]+bb[2])/2,5);r['lat']=round((bb[1]+bb[3])/2,5);r['prec']='city';R['br'].append(r);done=True
     if not done:unm[(r['b'],r['comd'])]+=1
     elif r.get('prec') in ('city',None):approx[r['b']]+=1;r['a']=1
+json.dump(sorted(r['k'] for R in REG for r in R['br'] if r.get('a')),open(f'{HERE}/data/approssimate.json','w'))
 print('sedi senza comune riconosciuto (scartate):',sum(unm.values()),list(unm.items())[:12]);print('posizione approssimativa:',dict(approx))
 KEY={"Valle d'Aosta/Vallée d'Aoste":("Valle d'Aosta",'valle-d-aosta'),'Trentino-Alto Adige/Südtirol':('Trentino-Alto Adige','trentino-alto-adige')}
 regs=json.load(open(f'{DATA}/g/../regions.geojson'))['features'] if os.path.exists(f'{DATA}/regions.geojson') else json.load(open(f'{HERE}/data/regions.geojson'))['features']
@@ -102,7 +103,7 @@ summary=[]
 for R in REG:
     rname,slug=KEY.get(R['rname'],(R['rname'],re.sub(r'[^a-z]+','-',unicodedata.normalize('NFKD',R['rname'].lower()).encode('ascii','ignore').decode()).strip('-')))
     pf=[{'type':'Feature','properties':{'p':f['properties']['prov_acr'],'n':f['properties']['prov_name']},'geometry':geom(f['geometry'])} for f in prov if f['properties']['reg_name']==R['rname']]
-    br=[{k:v for k,v in b.items() if k not in('comd','provd','prec','tel','marchio','spec','a') or (k=='a')} for b in R['br']]
+    br=[{k:v for k,v in b.items() if k not in('k','comd','provd','prec','tel','marchio','spec')} for b in R['br']]
     cnt=collections.defaultdict(set)
     for b in br:cnt[b['com']].add(b['b'])
     k2=sum(len(v)>=2 for v in cnt.values());k3=sum(len(v)==3 for v in cnt.values())

@@ -23,6 +23,10 @@ def ok(res,r):
     conf=(res.get('rank') or {}).get('confidence',0)
     return near and conf>=0.6 and res.get('result_type') in ('building','amenity','street','postcode','suburb','locality','city')
 st=collections.Counter()
+t0=time.time()
+def barra(i):
+    n=len(todo);done=i+1;w=30;fill=int(w*done/n);el=time.time()-t0;eta=el/done*(n-done)
+    sys.stdout.write(f"\r[{'#'*fill}{'.'*(w-fill)}] {done}/{n} ({100*done//n}%)  esatte {st['esatta']}  non trovate {st['non trovata']+st['scartata']}  restano ~{int(eta//60)}m{int(eta%60):02d}s   ");sys.stdout.flush()
 for i,r in enumerate(todo):
     citta=r["CITTA'"].title();q=clean(r["INDIRIZZO"])+', '+r["CAP"]+' '+citta+', Italia'
     u='https://api.geoapify.com/v1/geocode/search?'+urllib.parse.urlencode({'text':q,'filter':'countrycode:it','format':'json','limit':1,'lang':'it','apiKey':KEY})
@@ -39,7 +43,9 @@ for i,r in enumerate(todo):
         if not prova:cache[rkey(r)]=val
     else:st['non trovata']+=1
     if prova:print(q,'->',(g or {}).get('result_type'),(g or {}).get('rank'),g and (g['lat'],g['lon']))
-    if i%50==0 and not prova:json.dump(cache,open(CACHE,'w'));print(i,len(todo),dict(st),flush=True)
+    if not prova:
+        barra(i)
+        if i%25==0:json.dump(cache,open(CACHE,'w'))
     time.sleep(0.25)
 if not prova:json.dump(cache,open(CACHE,'w'))
-print('FATTO',dict(st))
+print('\nFATTO',dict(st),'- risultati salvati in data/geocode.json' if not prova else '(prova: nulla salvato)')

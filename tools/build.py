@@ -80,7 +80,12 @@ for r in raw:
             if not(rb[0]<=r['lon']<=rb[2] and rb[1]<=r['lat']<=rb[3]):continue
             for f,bb in zip(R['cf'],R['bbs']):
                 if inside(r['lon'],r['lat'],f['geometry'],bb):
-                    r['com']=f['properties']['n'];r['prov']=f['properties']['p'];R['br'].append(r);done=True;break
+                    r['com']=f['properties']['n'];r['prov']=f['properties']['p'];done=True
+                    exp=byname.get(cname(r['comd']),[])
+                    if len(exp)==1 and exp[0][1] is not f:   # la posizione cade in un comune diverso da quello del CSV: si fida del CSV
+                        done=False
+                    else:R['br'].append(r)
+                    break
             if done:break
     if not done:
         # coordinate assenti o fuori comune: uso il nome del comune (se univoco) e il centro del comune

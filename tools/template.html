@@ -56,6 +56,8 @@ button.act{border:1px solid var(--line);background:#fff;border-radius:6px;paddin
 .pinfo .x{float:right;border:0;background:none;font-size:22px;line-height:1;cursor:pointer;padding:0 2px;color:#666}
 .pinfo .t{font-size:15px;font-weight:700}
 .pinfo a{display:block;padding:5px 0;color:#1d4ed8;cursor:pointer;border-top:1px solid #eee}
+td.n{font-variant-numeric:tabular-nums}
+td:first-child{white-space:nowrap}
 @media(max-width:820px){#app{grid-template-columns:1fr;grid-template-rows:60vh auto;height:auto;min-height:100%}#map{order:-1;height:60vh}aside{border:0;overflow:visible}.tablewrap{flex:none;max-height:65vh}.legend{font-size:11px;padding:5px 8px;line-height:1.5}}
 </style>
 </head>
@@ -149,10 +151,13 @@ function visible(){const p=$('selProv').value,q=$('q').value.trim().toLowerCase(
 const pn=p=>PROVN[p]||p;
 const stTag=c=>c.k===1?`<span class="tag ${c.only}">Solo ${c.only}</span>`:c.k===2?`<span class="tag k2">2 banche</span>`:`<span class="tag k3">3 banche</span>`;
 const stTxt=c=>c.k===1?'Solo '+BN[c.only]:c.k+' banche';
+const BARC={ISP:'21,128,61',BPER:'124,58,237',MPS:'37,99,235'};let MX={ISP:1,BPER:1,MPS:1};
+const bar=(k,v)=>{if(!v)return '';const p=Math.round(100*v/MX[k]);return ' style="background:linear-gradient(270deg,rgba('+BARC[k]+',.2) '+p+'%,transparent '+p+'%)"'};
 function renderTable(){
   let rows=visible();
   const key={n:c=>c.n,p:c=>pn(c.p)+c.n,ISP:c=>-c.ISP,BPER:c=>-c.BPER,MPS:c=>-c.MPS,st:c=>-c.k+c.n}[sortKey];
   rows.sort((a,b)=>{const x=key(a),y=key(b);return (x>y?1:x<y?-1:0)*sortDir});
+  BK.forEach(k=>MX[k]=Math.max(1,...rows.map(r=>r[k])));
   let h='';
   if(sortKey==='p'){let cur='';rows.forEach(c=>{if(c.p!==cur){cur=c.p;const g=rows.filter(r=>r.p===cur);h+=`<tr class=prov><td colspan=2>${esc(pn(cur))} (${g.length} comuni, ${g.filter(r=>r.k>=2).length} con 2+ banche)</td>${BK.map(k=>`<td class=n>${g.reduce((s,r)=>s+r[k],0)}</td>`).join('')}<td></td></tr>`}h+=row(c)})}
   else rows.forEach(c=>h+=row(c));
@@ -160,7 +165,7 @@ function renderTable(){
   const vis=new Set(rows.map(r=>r.n));
   comLayer.eachLayer(l=>{const n=l.feature.properties.n,c=counts[n];l.setStyle({fillColor:fillOf(c),fillOpacity:vis.has(n)||c.k===0?opOf(c):.03})});
 }
-function row(c){return `<tr class="c${selected===c.n?' sel':''}" data-n="${esc(c.n)}"><td>${esc(c.n)}</td><td>${c.p}</td>${BK.map(k=>`<td class=n>${c[k]||''}</td>`).join('')}<td>${stTag(c)}</td></tr>`}
+function row(c){return `<tr class="c${selected===c.n?' sel':''}" data-n="${esc(c.n)}"><td>${esc(c.n)}</td><td>${c.p}</td>${BK.map(k=>`<td class=n${bar(k,c[k])}>${c[k]||''}</td>`).join('')}<td>${stTag(c)}</td></tr>`}
 function selectComune(n){selected=n;const l=comByName[n];if(!l)return;map.fitBounds(l.getBounds(),{maxZoom:13,padding:[30,30]});
   const c=counts[n],bs=active().filter(b=>b.com===n);
   l.bindPopup(`<div class=pop><b>${esc(n)} (${c.p})</b><div class=m>${BK.map(k=>k+': '+c[k]).join(' · ')}</div>${bs.map(b=>`<div style="color:${BC[b.b]}">● ${esc(b.nome)} <span class=m>– ${esc(b.ind)}</span></div>`).join('')}</div>`,{maxWidth:340}).openPopup(l.getBounds().getCenter());

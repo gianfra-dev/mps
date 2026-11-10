@@ -19,7 +19,29 @@ main{max-width:1120px;margin:0 auto;padding:20px 20px 40px;display:grid;grid-tem
 svg{width:100%;height:auto;display:block}
 .reg{-webkit-tap-highlight-color:rgba(179,0,27,.25)}
 .reg path{fill:#fff;stroke:#b3001b;stroke-width:1.1;stroke-linejoin:round;transition:fill .15s}
-.reg:hover path,.reg:focus path{fill:#b3001b}
+.reg path{transition:fill .25s,stroke-width .15s}
+.reg:hover path,.reg:focus-visible path,.reg.hl path{stroke-width:2.4;stroke:#7a0013}
+.reg:focus{outline:none}
+.lbl{font:700 8.5px var(--serif);fill:#1c2230;paint-order:stroke;stroke:rgba(255,255,255,.9);stroke-width:2.4px;stroke-linejoin:round;pointer-events:none;text-anchor:middle}
+.lbl.dk{fill:#fff;stroke:rgba(0,0,0,.5)}
+.toolbar{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 10px}
+.toolbar button{border:1px solid #e3b4b4;background:rgba(255,255,255,.92);padding:5px 12px;border-radius:999px;font:13px var(--serif);cursor:pointer;color:var(--ink)}
+.toolbar button:hover{border-color:#b3001b}
+.toolbar button[aria-pressed=true]{background:#1c2230;color:#fff;border-color:#1c2230}
+.scale{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--mute);margin-top:8px}
+.scale .bar{height:10px;flex:0 0 170px;border-radius:5px;border:1px solid #e3b4b4}
+.scale em{margin-left:6px}
+.card input[type=search]{width:100%;font:14px var(--serif);padding:8px 10px;border:1px solid #e3b4b4;border-radius:8px;margin-bottom:8px;background:#fff}
+#tbl th{cursor:pointer;user-select:none;white-space:nowrap}
+#tbl th:hover{color:var(--ink)}
+#tbl th[aria-sort=ascending]::after{content:" \2191"}
+#tbl th[aria-sort=descending]::after{content:" \2193"}
+#tbl td.n{font-variant-numeric:tabular-nums}
+#tbl tbody tr:hover td,#tbl tbody tr.hl td{background-color:rgba(255,246,214,.85)}
+#tbl tfoot td{font-weight:700;border-top:2px solid #b3001b;border-bottom:0;padding-top:6px}
+#tbl td.i{background-repeat:no-repeat}
+#tbl td:first-child{white-space:nowrap}
+#tbl td{background-repeat:no-repeat}
 #tip{position:absolute;pointer-events:none;background:#1c2230;color:#fff;padding:6px 10px;border-radius:8px;font-size:13px;line-height:1.5;display:none;white-space:nowrap;z-index:2}
 #tip b{font-size:14px}
 .i{color:#15803d}.b{color:#7c3aed}.m{color:#2563eb}.y{color:#a16207}
@@ -43,7 +65,11 @@ footer{text-align:center;font-size:12.5px;color:#7a2a2a;padding:0 20px 24px;font
 </header>
 <main>
   <div class="mapbox">
+    <div class="toolbar" role="group" aria-label="Colora la mappa in base a">
+      <button type="button" data-k="tot" aria-pressed="true">Sedi totali</button><button type="button" data-k="o" aria-pressed="false">Comuni con 2+ banche</button><button type="button" data-k="i" aria-pressed="false">Intesa</button><button type="button" data-k="b" aria-pressed="false">BPER</button><button type="button" data-k="m" aria-pressed="false">MPS</button>
+    </div>
     <svg viewBox="0 0 __W__ __H__" role="img" aria-label="Mappa schematica dell'Italia divisa per regioni">__SVG__</svg>
+    <div class="scale" id="scale"></div>
     <div id="tip"></div>
   </div>
   <div>
@@ -51,18 +77,52 @@ footer{text-align:center;font-size:12.5px;color:#7a2a2a;padding:0 20px 24px;font
       <div class="tot"><div><b class="i">__TI__</b>Intesa Sanpaolo</div><div><b class="b">__TB__</b>BPER Banca</div><div><b class="m">__TM__</b>Monte dei Paschi</div><div><b class="y">__TO__</b>comuni con 2+ banche</div></div>
     </div>
     <div class="card">
-      <table><thead><tr><th>Regione</th><th class="n i">ISP</th><th class="n b">BPER</th><th class="n m">MPS</th><th class="n y">Comuni 2+ banche</th></tr></thead><tbody>__ROWS__</tbody></table>
+      <input type="search" id="q" placeholder="Cerca una regione" aria-label="Cerca una regione">
+      <table id="tbl"><thead><tr><th>Regione</th><th class="n i">ISP</th><th class="n b">BPER</th><th class="n m">MPS</th><th class="n y">Comuni 2+ banche</th></tr></thead><tbody>__ROWS__</tbody></table>
     </div>
     <p class="note">Elenco degli sportelli (succursali in Italia, attive) dalla Banca d'Italia, aggiornato al __DATE__. Le posizioni sulle mappe sono ricavate dagli indirizzi con geocodifica: per alcune sedi sono approssimative.</p>
   </div>
 </main>
 <footer>Mappa schematica semplificata · confini ISTAT da openpolis/geojson-italy</footer>
 <script>
-const tip=document.getElementById('tip'),box=document.querySelector('.mapbox');
-if(window.matchMedia('(hover:hover)').matches)document.querySelectorAll('a.reg').forEach(a=>{
-  const show=e=>{tip.innerHTML=`<b>${a.dataset.n}</b><br><span style="color:#86efac">ISP ${a.dataset.i}</span> · <span style="color:#c4b5fd">BPER ${a.dataset.b}</span> · <span style="color:#93c5fd">MPS ${a.dataset.m}</span><br><span style="color:#fde047">comuni con 2+ banche: ${a.dataset.o}</span>`;tip.style.display='block';const r=box.getBoundingClientRect();tip.style.left=Math.min(e.clientX-r.left+14,r.width-230)+'px';tip.style.top=(e.clientY-r.top+14)+'px'};
-  a.addEventListener('mousemove',show);a.addEventListener('mouseleave',()=>tip.style.display='none');
-});
+const $=s=>document.querySelector(s);
+const tip=$('#tip'),box=$('.mapbox');
+const regs=[...document.querySelectorAll('a.reg')];
+const HUE={tot:[179,0,27],o:[179,0,27],i:[21,128,61],b:[124,58,237],m:[37,99,235]};
+const UNIT={tot:'sedi',o:'comuni con 2+ banche',i:'sedi Intesa',b:'sedi BPER',m:'sedi MPS'};
+const val=(a,k)=>k==='tot'?(+a.dataset.i)+(+a.dataset.b)+(+a.dataset.m):k==='o'?+a.dataset.o:+a.dataset[k];
+const mix=(h,t)=>'rgb('+[255,255,255].map((w,i)=>Math.round(w+(h[i]-w)*t)).join(',')+')';
+const SHORT={"Valle d'Aosta":"VdA","Trentino-Alto Adige":"TAA","Friuli-Venezia Giulia":"FVG"};
+regs.forEach(a=>{const bb=a.querySelector('path').getBBox(),n=a.dataset.n,t=document.createElementNS('http://www.w3.org/2000/svg','text');
+  t.setAttribute('class','lbl');t.setAttribute('x',bb.x+bb.width/2);t.setAttribute('y',bb.y+bb.height/2+3);
+  t.textContent=bb.width<44?(SHORT[n]||n.slice(0,3)+'.'):(SHORT[n]&&bb.width<90?SHORT[n]:n);a.appendChild(t);a._t=t});
+function paint(k){const mx=Math.max(1,...regs.map(a=>val(a,k)));
+  regs.forEach(a=>{const t=Math.sqrt(val(a,k)/mx);a.querySelector('path').style.fill=mix(HUE[k],t);a._t.classList.toggle('dk',t>.6)});
+  $('#scale').innerHTML='<span>0</span><div class="bar" style="background:linear-gradient(90deg,#fff,'+mix(HUE[k],1)+')"></div><span>'+mx+'</span><em>'+UNIT[k]+' (scala a radice quadrata)</em>';
+  document.querySelectorAll('.toolbar button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===k))}
+document.querySelectorAll('.toolbar button').forEach(b=>b.onclick=()=>paint(b.dataset.k));
+paint('tot');
+const hover=window.matchMedia('(hover:hover)').matches;
+if(hover)regs.forEach(a=>{
+  const show=e=>{const tt=val(a,'tot');tip.innerHTML='<b>'+a.dataset.n+'</b><br><span style="color:#86efac">ISP '+a.dataset.i+'</span> &middot; <span style="color:#c4b5fd">BPER '+a.dataset.b+'</span> &middot; <span style="color:#93c5fd">MPS '+a.dataset.m+'</span><br>totale '+tt+'<br><span style="color:#fde047">comuni con 2+ banche: '+a.dataset.o+'</span>';tip.style.display='block';const r=box.getBoundingClientRect();tip.style.left=Math.min(e.clientX-r.left+14,r.width-230)+'px';tip.style.top=(e.clientY-r.top+14)+'px'};
+  a.addEventListener('mousemove',show);a.addEventListener('mouseleave',()=>tip.style.display='none')});
+/* tabella: totale, barre, ordinamento, ricerca, tabella e mappa collegate */
+const tbl=$('#tbl'),tb=tbl.tBodies[0],hr=tbl.tHead.rows[0],rows=[...tb.rows];
+hr.cells[hr.cells.length-1].insertAdjacentHTML('beforebegin','<th class="n">Totale</th>');
+const C=[null,'21,128,61','124,58,237','37,99,235','179,0,27','202,138,4'];
+rows.forEach(tr=>{const c=tr.cells,i=+c[1].textContent,b=+c[2].textContent,m=+c[3].textContent,o=+c[4].textContent;
+  c[4].insertAdjacentHTML('beforebegin','<td class="n">'+(i+b+m)+'</td>');tr._d=[c[0].textContent,i,b,m,i+b+m,o];tr._slug=c[0].querySelector('a').getAttribute('href')});
+const mxs=[0,1,2,3,4,5].map(j=>j?Math.max(...rows.map(r=>r._d[j])):0);
+rows.forEach(tr=>[1,2,3,4,5].forEach(j=>{tr.cells[j].style.backgroundImage='linear-gradient(270deg,rgba('+C[j]+',.2) '+Math.round(100*tr._d[j]/mxs[j])+'%,transparent '+Math.round(100*tr._d[j]/mxs[j])+'%)'}));
+const tf=tbl.createTFoot().insertRow();tf.innerHTML='<td>Italia</td>'+[1,2,3,4,5].map(j=>'<td class="n">'+rows.reduce((s,r)=>s+r._d[j],0)+'</td>').join('');
+const ths=[...hr.cells];let sk=0,sd=1;
+ths.forEach((th,j)=>th.onclick=()=>{sd=sk===j?-sd:(j?-1:1);sk=j;
+  rows.sort((a,b)=>{const x=a._d[j],y=b._d[j];return (x>y?1:x<y?-1:0)*sd*(j?1:1)}).forEach(r=>tb.appendChild(r));
+  ths.forEach((t,k)=>k===j?t.setAttribute('aria-sort',sd>0?'ascending':'descending'):t.removeAttribute('aria-sort'))});
+$('#q').oninput=e=>{const q=e.target.value.trim().toLowerCase();rows.forEach(r=>r.hidden=!!q&&!r._d[0].toLowerCase().includes(q))};
+const byslug={};regs.forEach(a=>byslug[a.getAttribute('href')]=a);
+rows.forEach(r=>{const a=byslug[r._slug];r.addEventListener('mouseenter',()=>a&&a.classList.add('hl'));r.addEventListener('mouseleave',()=>a&&a.classList.remove('hl'));
+  if(a){a.addEventListener('mouseenter',()=>r.classList.add('hl'));a.addEventListener('mouseleave',()=>r.classList.remove('hl'))}});
 </script>
 </body>
 </html>

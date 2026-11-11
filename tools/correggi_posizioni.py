@@ -2,7 +2,7 @@
 """Correzione manuale delle sedi con posizione approssimativa.
   python3 correggi_posizioni.py esporta   -> crea data/da_correggere.csv (una riga per sede, con link di ricerca su OpenStreetMap)
   (compila lat e lon nel CSV: da Excel/Numbers, separatore ';', decimali con punto o virgola)
-  python3 correggi_posizioni.py importa   -> inserisce le coordinate compilate in data/geocode.json (precisione 'manuale')
+  python3 correggi_posizioni.py importa   -> inserisce le coordinate compilate in data/geocode.json (precisione 'manuale') e toglie quelle righe dal CSV
 Poi rigenera le pagine con build.py."""
 import sys,os,json,csv,urllib.parse
 HERE=os.path.dirname(os.path.abspath(__file__));sys.path.insert(0,HERE)
@@ -25,11 +25,16 @@ if sys.argv[1]=='esporta':
                 w.writerow([NOMI[b],r['CODICE SUCCURSALE'],r['INDIRIZZO'],r['CAP'],r["CITTA'"],'','','https://www.openstreetmap.org/search?query='+urllib.parse.quote(q),k]);n+=1
     print(n,'sedi da correggere ->',OUT)
 else:
-    n=0;bad=0
-    for row in csv.DictReader(open(OUT,encoding='utf-8-sig'),delimiter=';'):
-        if not row['lat'].strip() or not row['lon'].strip():continue
+    n=0;bad=0;resto=[]
+    rd=csv.DictReader(open(OUT,encoding='utf-8-sig'),delimiter=';');campi=rd.fieldnames
+    for row in rd:
+        if not row['lat'].strip() or not row['lon'].strip():resto.append(row);continue
         try:la=float(row['lat'].replace(',','.'));lo=float(row['lon'].replace(',','.'))
-        except ValueError:bad+=1;print('valori non numerici:',row['banca'],row['indirizzo'],row['citta']);continue
-        if not(35<la<48 and 6<lo<19):bad+=1;print('fuori dall\'Italia (lat/lon invertiti?):',row['banca'],row['indirizzo'],row['citta'],la,lo);continue
+        except ValueError:bad+=1;resto.append(row);print('valori non numerici:',row['banca'],row['indirizzo'],row['citta']);continue
+        if not(35<la<48 and 6<lo<19):bad+=1;resto.append(row);print('fuori dall\'Italia (lat/lon invertiti?):',row['banca'],row['indirizzo'],row['citta'],la,lo);continue
         cache[row['chiave']]=[la,lo,'manuale'];n+=1
-    json.dump(cache,open(CACHE,'w'));print(n,'posizioni importate;',bad,'scartate')
+    json.dump(cache,open(CACHE,'w'))
+    # le sedi importate vengono tolte dal CSV: restano solo quelle ancora da correggere (comprese le scartate)
+    with open(OUT,'w',newline='',encoding='utf-8-sig') as f:
+        w=csv.DictWriter(f,fieldnames=campi,delimiter=';');w.writeheader();w.writerows(resto)
+    print(n,'posizioni importate (rimosse dal CSV);',bad,'scartate (restano nel CSV);',len(resto),'righe rimaste ->',OUT)

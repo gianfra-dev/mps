@@ -94,7 +94,7 @@ td:first-child{white-space:nowrap}
   <div class="tablewrap"><table id="tbl"><thead><tr>
     <th data-s="n">Comune</th><th data-s="p">Pr.</th><th class="n" data-s="ISP" style="color:var(--isp)">ISP</th><th class="n" data-s="BPER" style="color:var(--bper)">BPER</th><th class="n" data-s="MPS" style="color:var(--mps)">MPS</th><th data-s="st">Stato</th>
   </tr></thead><tbody></tbody></table></div>
-  <div class="foot">Colore comune: <span style="color:#ca8a04">■</span> 2 banche · <span style="color:#ea580c">■</span> 3 banche · verde/viola/blu = una sola banca · grigio = nessuna filiale. Linee rosse: coppie di banche diverse entro il raggio (solo sedi con posizione esatta). Cerchio tratteggiato: sedi senza posizione esatta, collocate al centro del comune. Elenco sportelli: Banca d'Italia, aggiornato al 11/11/2026. Posizioni sulla mappa ricavate dagli indirizzi con OpenStreetMap, Geoapify e <a href="https://locationiq.com" target="_blank" rel="noopener">Search by LocationIQ.com</a> (alcune approssimative). Confini ISTAT (openpolis).</div>
+  <div class="foot">Colore comune: <span style="color:#ca8a04">■</span> 2 banche · <span style="color:#ea580c">■</span> 3 banche · verde/viola/blu = una sola banca · grigio = nessuna filiale. Linee rosse: coppie di banche diverse entro il raggio (solo sedi con posizione esatta). Cerchio tratteggiato: sedi senza posizione esatta, collocate al centro del comune. Elenco sportelli: Banca d'Italia, aggiornato al 11/11/2026. Posizioni sulla mappa ricavate dagli indirizzi (alcune approssimative). Elaborazione prodotta dalla FISAC - CGIL Firenze.</div>
 </aside>
 <div id="map"></div>
 </div>
@@ -110,7 +110,7 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const fillOf=c=>c.k===0?'#e5e7eb':c.k===1?BC[c.only]:COLK[c.k];
 const opOf=c=>c.k===0?.1:c.k===1?.4:.7;
 const map=L.map('map',{zoomControl:true}).setView([42.5,12.5],6);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:18}).addTo(map);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'Elaborazione prodotta dalla FISAC - CGIL Firenze',maxZoom:18}).addTo(map);
 let view='all',sortKey='n',sortDir=1,selected=null,counts={};
 const comLayer=L.geoJSON(D.comuni,{style:()=>({weight:.6,color:'#9aa3b2',fillOpacity:.1,fillColor:'#e5e7eb'}),
   onEachFeature:(f,l)=>{l.on('click',()=>onMapClick(f.properties));}}).addTo(map);

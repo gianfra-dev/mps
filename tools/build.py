@@ -126,11 +126,12 @@ paths=[]
 for s in summary:
     g=s['feat']['geometry'];polys=[g['coordinates']] if g['type']=='Polygon' else g['coordinates'];ds=''
     for poly in polys:
+        if sum(p[1] for p in poly[0])/len(poly[0])<36.2:continue   # Lampedusa e Linosa fuori dalla mappa schematica
         ring=[proj(p) for p in poly[0]];xs=[p[0] for p in ring];ys=[p[1] for p in ring]
         if (max(xs)-min(xs))*(max(ys)-min(ys))<6:continue
         ds+='M'+'L'.join(f'{x},{y}' for x,y in dpring(ring,0.35))+'Z'
     paths.append((s,ds))
-W=math.ceil((18.8-X0)*K*S);H=math.ceil((Y0-35.4)*S)
+W=math.ceil((18.8-X0)*K*S);H=math.ceil((Y0-36.55)*S)
 svg=''.join(f'<a href="{s["slug"]}/" class="reg" data-n="{s["name"]}" data-i="{s["n"]["ISP"]}" data-b="{s["n"]["BPER"]}" data-m="{s["n"]["MPS"]}" data-o="{s["k2"]}"><title>{s["name"]}</title><path d="{ds}"/></a>' for s,ds in paths)
 rows=''.join(f'<tr><td><a href="{s["slug"]}/">{s["name"]}</a></td><td class="n i">{s["n"]["ISP"]}</td><td class="n b">{s["n"]["BPER"]}</td><td class="n m">{s["n"]["MPS"]}</td><td class="n y">{s["k2"]}</td></tr>' for s in sorted(summary,key=lambda s:s['name']))
 tot=lambda k:sum(s['n'][k] for s in summary)

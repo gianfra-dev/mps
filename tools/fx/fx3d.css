@@ -68,3 +68,13 @@ html{overflow-x:clip}
 .fx-dice .name{position:relative;font:700 22px/1.2 Copperplate,"Copperplate Gothic Bold","Palatino Linotype",Georgia,serif;letter-spacing:.14em;text-transform:uppercase;color:#f3e6c4;background:linear-gradient(180deg,#b52828,#7d1515);border:2px solid #e8c872;border-radius:4px;padding:8px 26px;box-shadow:0 4px 0 rgba(0,0,0,.4);transform:rotate(-1.5deg);opacity:0;animation:fxName .5s 1s cubic-bezier(.3,1.6,.5,1) forwards}
 @keyframes fxName{from{transform:scale(.4) rotate(-8deg);opacity:0}to{transform:rotate(-1.5deg);opacity:1}}
 @media (max-width:560px){.fx-cube{width:64px;height:64px}.fx-cube .f{padding:10px;border-radius:11px}.fx-cube .f1{transform:translateZ(32px)}.fx-cube .f6{transform:rotateY(180deg) translateZ(32px)}.fx-cube .f3{transform:rotateY(90deg) translateZ(32px)}.fx-cube .f4{transform:rotateY(-90deg) translateZ(32px)}.fx-cube .f2{transform:rotateX(90deg) translateZ(32px)}.fx-cube .f5{transform:rotateX(-90deg) translateZ(32px)}.fx-dice .pair{gap:44px}.fx-dice .name{font-size:16px}}
+
+/* telefono: la colonna non deve allargarsi oltre lo schermo (la tabella ha una larghezza minima) */
+@media (max-width:820px){
+  main{grid-template-columns:minmax(0,1fr)!important;padding-left:12px;padding-right:12px}
+  main>*{min-width:0}
+  .card{overflow-x:auto}
+  #tbl{font-size:12.5px}
+  #tbl th{font-size:9.5px;padding-left:2px;padding-right:2px}
+  #tbl td{padding-left:2px;padding-right:2px}
+}

@@ -82,8 +82,10 @@ for r in raw:
                 if inside(r['lon'],r['lat'],f['geometry'],bb):
                     r['com']=f['properties']['n'];r['prov']=f['properties']['p'];done=True
                     exp=byname.get(cname(r['comd']),[])
-                    if len(exp)==1 and exp[0][1] is not f:   # la posizione cade in un comune diverso da quello del CSV: si fida del CSV
-                        done=False
+                    if len(exp)==1 and exp[0][1] is not f:   # la posizione cade in un comune diverso da quello del CSV
+                        if r.get('prec') in ('bank','bank1','manuale'):   # pin del locator ufficiale o inserito a mano: si tiene il pin, il comune è quello del CSV
+                            Rx,fx,_=exp[0];r['com']=fx['properties']['n'];r['prov']=fx['properties']['p'];Rx['br'].append(r)
+                        else:done=False                                    # geocodifica automatica dubbia: si fida del CSV (centro del comune)
                     else:R['br'].append(r)
                     break
             if done:break
@@ -91,7 +93,10 @@ for r in raw:
         # coordinate assenti o fuori comune: uso il nome del comune (se univoco) e il centro del comune
         c=byname.get(cname(r['comd']),[])
         if len(c)==1:
-            R,f,bb=c[0];r['com']=f['properties']['n'];r['prov']=f['properties']['p'];r['lon']=round((bb[0]+bb[2])/2,5);r['lat']=round((bb[1]+bb[3])/2,5);r['prec']='city';R['br'].append(r);done=True
+            R,f,bb=c[0];r['com']=f['properties']['n'];r['prov']=f['properties']['p']
+            if r['lat'] is None or r.get('prec') not in ('bank','bank1','manuale'):
+                r['lon']=round((bb[0]+bb[2])/2,5);r['lat']=round((bb[1]+bb[3])/2,5);r['prec']='city'
+            R['br'].append(r);done=True
     if not done:unm[(r['b'],r['comd'])]+=1
     elif r.get('prec') in ('city',None):approx[r['b']]+=1;r['a']=1
 json.dump(sorted(r['k'] for R in REG for r in R['br'] if r.get('a')),open(f'{HERE}/data/approssimate.json','w'))

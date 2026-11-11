@@ -1,0 +1,330 @@
+{
+ "non_risolte": [
+  {
+   "banca": "ISP",
+   "indirizzo": "PIAZZA GARIBALDI, 1",
+   "cap": "06043",
+   "citta": "CASCIA",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 0 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "PRESSO COMPLESSO IMMOBILIARE DI VIA FRAMARIN, BLOCCO N.16 - VIA BTG. FRAMARIN",
+   "cap": "36100",
+   "citta": "VICENZA",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 6 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "PRESSO CENTRO DIREZIONALE CISANELLO - VIA MATTEUCCI",
+   "cap": "56124",
+   "citta": "PISA",
+   "frazione": "LOC:CISANELLO",
+   "motivo": "nessuna corrispondenza tra 4 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "SAN MARCO - CAMPO MANIN, 4216",
+   "cap": "30124",
+   "citta": "VENEZIA",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 14 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "VIA MAZZINI, 9/13",
+   "cap": "45100",
+   "citta": "ROVIGO",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 4 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "VIA FRANCESCO DE SANTIS, 2",
+   "cap": "83100",
+   "citta": "AVELLINO",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 4 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "CORSO VITTORIO EMANUELE, 76/78/80",
+   "cap": "80053",
+   "citta": "CASTELLAMMARE DI STABIA",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 3 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "VIALE FULCO RUFFO DI CALABRIA PRESSO U.S. NAVAL SUPPORT ACTIVITY",
+   "cap": "80144",
+   "citta": "NAPOLI",
+   "frazione": "CAPODICHINO",
+   "motivo": "nessuna corrispondenza tra 26 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "PIAZZA G.B. DELL'ARMI, 1",
+   "cap": "31044",
+   "citta": "MONTEBELLUNA",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 2 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "VIA LYSWAEG, 1 - CONDOMINIO CAPRIOLO",
+   "cap": "11025",
+   "citta": "GRESSONEY-SAINT-JEAN",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 0 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "PRESSO CENTRO DIREZIONALE - LOTTO 2/B - VIA PORZIO, 4",
+   "cap": "80143",
+   "citta": "NAPOLI",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 26 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "VIA MADONNA DEL PANTANO C/O BASE MILITARE NATO",
+   "cap": "80014",
+   "citta": "GIUGLIANO IN CAMPANIA",
+   "frazione": "LOC:LAGO PATRIA",
+   "motivo": "nessuna corrispondenza tra 2 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "VIA MAZZINI, 9/11/13",
+   "cap": "45100",
+   "citta": "ROVIGO",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 4 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "VIA S. ANNA, 2 TRONCO PA. CENTRO DIREZIONALE",
+   "cap": "89100",
+   "citta": "REGGIO DI CALABRIA",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 6 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "VIA CIMA CADI', 5",
+   "cap": "25056",
+   "citta": "PONTE DI LEGNO",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 0 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "PRESSO F.A.O. - VIALE TERME DI CARACALLA",
+   "cap": "00153",
+   "citta": "ROMA",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 70 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "VIA GIOVANNI XXIII, 255/261",
+   "cap": "70124",
+   "citta": "BARI",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 12 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "VIA VAL DI SETTA ANG. VIA DELLE TRE VILLE",
+   "cap": "50010",
+   "citta": "CAMPI BISENZIO",
+   "frazione": "CAPALLE",
+   "motivo": "nessuna corrispondenza tra 2 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "VIA SKANDERBERG, 86",
+   "cap": "87010",
+   "citta": "LUNGRO",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 0 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "VIA CRISTOFORO COLOMBO, 13",
+   "cap": "64100",
+   "citta": "TERAMO",
+   "frazione": "SAN NICOLO' A TORDINO",
+   "motivo": "nessuna corrispondenza tra 4 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "STRADA NAZIONALE DEL TONALE, 92",
+   "cap": "24060",
+   "citta": "CASAZZA",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 1 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "PRESSO AEROPORTO MILITARE - COMANDO VI STORMO VIA CASTENEDOLO, 85",
+   "cap": "25016",
+   "citta": "GHEDI",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 1 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "VIA C. COLOMBO, 13",
+   "cap": "64100",
+   "citta": "TERAMO",
+   "frazione": "SAN NICOLO' A TORDINO",
+   "motivo": "nessuna corrispondenza tra 4 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "PRESSO CIS LOCALITA' BOSCOFANGONE ISOLA 4 TORRE 4",
+   "cap": "80035",
+   "citta": "NOLA",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 3 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "VIA NAZIONALE",
+   "cap": "82020",
+   "citta": "PIETRELCINA",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 0 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "VIALE FULCO DI CALABRIA PRESSO AEROPORTO DI CAPODICHINO",
+   "cap": "80144",
+   "citta": "NAPOLI",
+   "frazione": "AGNANO",
+   "motivo": "nessuna corrispondenza tra 26 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "PIAZZA GRIMALDI ANGOLO CORSO MAZZINI",
+   "cap": "88100",
+   "citta": "CATANZARO",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 5 sedi del locator nel comune"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo": "VIA MAZZINI, 9/13",
+   "cap": "45100",
+   "citta": "ROVIGO",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 4 sedi del locator nel comune"
+  },
+  {
+   "banca": "MPS",
+   "indirizzo": "PRESSO C.I.S. - CENTRO INGROSSO SVILUPPO CAMPANIA - LOC. BOSCOFANGONE - ISOLA 3",
+   "cap": "80035",
+   "citta": "NOLA",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 2 sedi del locator nel comune"
+  },
+  {
+   "banca": "MPS",
+   "indirizzo": "PRESSO GRUPPO FININVEST SPA - CORSO EUROPA, 46",
+   "cap": "20093",
+   "citta": "COLOGNO MONZESE",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 0 sedi del locator nel comune"
+  },
+  {
+   "banca": "MPS",
+   "indirizzo": "PIAZZA MARCONI  ANG.  VIA FONSECA",
+   "cap": "80035",
+   "citta": "NOLA",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 2 sedi del locator nel comune"
+  },
+  {
+   "banca": "MPS",
+   "indirizzo": "VIA G. GARIBALDI, IS.451",
+   "cap": "98121",
+   "citta": "MESSINA",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 3 sedi del locator nel comune"
+  },
+  {
+   "banca": "MPS",
+   "indirizzo": "PRESSO U.S.L. 30 - POLICLINICO DELLE SCOTTE",
+   "cap": "53100",
+   "citta": "SIENA",
+   "frazione": "LOC:LE SCOTTE",
+   "motivo": "nessuna corrispondenza tra 9 sedi del locator nel comune"
+  },
+  {
+   "banca": "MPS",
+   "indirizzo": "VIA SICILIA, 203/A",
+   "cap": "00187",
+   "citta": "ROMA",
+   "frazione": "",
+   "motivo": "nessuna corrispondenza tra 57 sedi del locator nel comune"
+  },
+  {
+   "banca": "MPS",
+   "indirizzo": "VIA AMMIRAGLIO RIZZO, 66-66/B",
+   "cap": "90142",
+   "citta": "PALERMO",
+   "frazione": "LOC:ARENELLA-VERGINE MARIA",
+   "motivo": "nessuna corrispondenza tra 8 sedi del locator nel comune"
+  },
+  {
+   "banca": "MPS",
+   "indirizzo": "S.S. 445 DELLA GARFAGNANA",
+   "cap": "55051",
+   "citta": "BARGA",
+   "frazione": "PONTE ALL'ANIA",
+   "motivo": "nessuna corrispondenza tra 2 sedi del locator nel comune"
+  }
+ ],
+ "assegnate_per_esclusione": [
+  {
+   "banca": "ISP",
+   "indirizzo_csv": "VIA DOMENICO RICCARDI, 123-125-127",
+   "citta": "CERCOLA",
+   "indirizzo_locator": "CORSO D.RICCARDI, 129"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo_csv": "VIA AMENDOLA",
+   "citta": "LA MADDALENA",
+   "indirizzo_locator": "VIA AMENDOLA, 7"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo_csv": "VIA MONTE CROCE 1 C/O OSPEDALE",
+   "citta": "DESENZANO DEL GARDA",
+   "indirizzo_locator": "VIA G. MARCONI, 18"
+  },
+  {
+   "banca": "ISP",
+   "indirizzo_csv": "VIALE VENEZIA GIULIA 178/180/182",
+   "citta": "ANDRIA",
+   "indirizzo_locator": "VIA A.DE GASPERI, 30"
+  },
+  {
+   "banca": "MPS",
+   "indirizzo_csv": "PIAZZA RISORGIMENTO, 3",
+   "citta": "REDONDESCO",
+   "indirizzo_locator": "PIAZZA RISORGIMENTO 0"
+  },
+  {
+   "banca": "MPS",
+   "indirizzo_csv": "VIA FILZI, 31/A",
+   "citta": "MOTTEGGIANA",
+   "indirizzo_locator": "VIA FABIO FILZI 31"
+  }
+ ]
+}

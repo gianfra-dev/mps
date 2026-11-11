@@ -110,7 +110,7 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const fillOf=c=>c.k===0?'#e5e7eb':c.k===1?BC[c.only]:COLK[c.k];
 const opOf=c=>c.k===0?.1:c.k===1?.4:.7;
 const map=L.map('map',{zoomControl:true}).setView([42.5,12.5],6);
-L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'Elaborazione prodotta dalla FISAC - CGIL Firenze',maxZoom:18}).addTo(map);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors · Elaborazione prodotta dalla FISAC - CGIL Firenze',maxZoom:18}).addTo(map);
 let view='all',sortKey='n',sortDir=1,selected=null,counts={};
 const comLayer=L.geoJSON(D.comuni,{style:()=>({weight:.6,color:'#9aa3b2',fillOpacity:.1,fillColor:'#e5e7eb'}),
   onEachFeature:(f,l)=>{l.on('click',()=>onMapClick(f.properties));}}).addTo(map);

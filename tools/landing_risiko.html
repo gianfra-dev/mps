@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FISAC – Filiali Intesa Sanpaolo, BPER e MPS per regione</title>
+<link rel="icon" href="assets/logo.png">
+<style>
+:root{--red:#9b1c1c;--ink:#2b1a0e;--mute:#6b5337;--parch:#f3e6c4;--parch2:#e6d3a3;--wood:#4a2c17;--gold:#e8c872;--serif:Georgia,"Times New Roman",Times,serif;--disp:Copperplate,"Copperplate Gothic Bold","Palatino Linotype",Palatino,Georgia,serif}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font:16px/1.5 var(--serif);color:var(--ink)}
+body{background:repeating-linear-gradient(45deg,rgba(255,255,255,.02) 0 2px,transparent 2px 5px),radial-gradient(ellipse at 50% 25%,#2f6b53 0%,#1e4a3a 55%,#122f25 100%) fixed;background-attachment:fixed}
+header{display:flex;align-items:center;gap:22px;padding:12px 28px;background:linear-gradient(180deg,#a82424,#741212);border-bottom:4px solid var(--gold);box-shadow:0 4px 0 var(--wood),0 8px 20px rgba(0,0,0,.5)}
+header img{height:60px;width:auto;background:#fff;padding:3px 8px;border-radius:6px;border:2px solid var(--gold);box-shadow:0 2px 0 rgba(0,0,0,.35)}
+header h1{font:700 22px/1.2 var(--disp);margin:0;text-transform:uppercase;letter-spacing:.07em;color:var(--parch);text-shadow:0 2px 0 rgba(0,0,0,.45)}
+header p{margin:4px 0 0;color:#f0d9a8;font-size:14px;font-style:italic}
+.dice{margin-left:auto;display:flex;gap:12px;flex:none}
+.dice{cursor:pointer;-webkit-user-select:none;user-select:none}
+.die.rolling{animation:roll .6s ease-out}
+@keyframes roll{0%{transform:rotate(0) scale(1)}35%{transform:rotate(300deg) scale(1.35) translateY(-8px)}100%{transform:rotate(360deg) scale(1)}}
+.die{width:44px;height:44px;border-radius:8px;display:grid;grid-template:repeat(3,1fr)/repeat(3,1fr);padding:7px;box-shadow:0 3px 0 rgba(0,0,0,.45),inset 0 -3px 0 rgba(0,0,0,.2),inset 0 2px 0 rgba(255,255,255,.35)}
+.die i{border-radius:50%;background:#fff;box-shadow:inset 0 -1px 0 rgba(0,0,0,.25)}
+.die.r{background:#c41e1e;transform:rotate(-9deg)}.die.u{background:#1f4fb8;transform:rotate(11deg)}
+main{max-width:1500px;margin:0 auto;padding:34px 22px 30px;display:grid;grid-template-columns:minmax(340px,2fr) minmax(300px,390px);gap:28px;align-items:start}
+.mapbox::before{content:"Il tabellone d'Italia";position:absolute;top:-17px;left:50%;transform:translateX(-50%) rotate(-2deg);background:linear-gradient(180deg,#b52828,#7d1515);color:var(--parch);font:700 13px var(--disp);letter-spacing:.12em;text-transform:uppercase;padding:4px 22px;border:2px solid var(--gold);border-radius:4px;box-shadow:0 3px 0 rgba(0,0,0,.4);white-space:nowrap;z-index:3}
+.mapbox{position:relative;padding:14px;background:var(--parch);border:3px solid var(--wood);border-radius:6px;box-shadow:0 0 0 3px var(--gold),0 0 0 6px var(--wood),0 14px 30px rgba(0,0,0,.55)}
+svg{width:100%;height:auto;display:block;border:2px solid var(--wood);border-radius:3px;background:linear-gradient(90deg,transparent calc(50% - 1px),rgba(0,0,0,.3) 50%,rgba(255,255,255,.16) calc(50% + 1px),transparent calc(50% + 2px)),linear-gradient(0deg,transparent calc(50% - 1px),rgba(0,0,0,.3) 50%,rgba(255,255,255,.16) calc(50% + 1px),transparent calc(50% + 2px)),radial-gradient(circle at 48% 42%,#a7a44c 0%,#8c893b 55%,#5d5b24 100%);box-shadow:inset 0 0 50px rgba(30,30,5,.55)}
+.reg{-webkit-tap-highlight-color:rgba(255,255,255,.25)}
+.reg path{fill:#e8a64a;stroke:#2d2410;stroke-width:1;stroke-linejoin:round;transition:fill .25s,stroke-width .15s}
+.reg:hover path,.reg:focus-visible path,.reg.hl path{stroke-width:2.4;stroke:#fff}
+.reg:focus{outline:none}
+.sea{font:italic 700 9px var(--serif);letter-spacing:.28em;text-transform:uppercase;fill:rgba(238,234,166,.72);text-anchor:middle;pointer-events:none}
+.conn{stroke:#fff;stroke-width:1.4;stroke-dasharray:4 3.5;opacity:.85;fill:none}
+.lbl{font:800 8.4px var(--disp);letter-spacing:.03em;text-transform:uppercase;fill:#2a1d0a;paint-order:stroke;stroke:rgba(255,255,255,.4);stroke-width:2.2px;stroke-linejoin:round;pointer-events:none;text-anchor:middle}
+.num{font:800 13px var(--disp);fill:#2a1d0a;paint-order:stroke;stroke:rgba(255,255,255,.55);stroke-width:2.6px;stroke-linejoin:round;pointer-events:none;text-anchor:middle}
+.pz{stroke:#1a1206;stroke-width:1.2;filter:drop-shadow(0 1.5px 0 rgba(0,0,0,.5))}
+.pzt{fill:rgba(255,255,255,.45)}
+.pz,.pzt,.num{transition:transform .18s cubic-bezier(.3,1.6,.5,1)}
+.up .pz,.up .pzt,.up .num{transform:translateY(-4px) scale(1.1);transform-box:fill-box;transform-origin:center}
+.toolbar{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 12px}
+.toolbar button{border:2px solid var(--wood);background:var(--parch2);padding:5px 14px;border-radius:999px;font:700 11.5px var(--disp);letter-spacing:.05em;text-transform:uppercase;cursor:pointer;color:var(--ink);box-shadow:0 3px 0 var(--wood);transition:transform .12s}
+.toolbar button:hover{background:#ffe9a8;transform:translateY(-2px) rotate(-1.5deg)}
+.toolbar button[aria-pressed=true]{background:#8f1212;color:var(--parch);transform:translateY(2px);box-shadow:none;border-color:#4d0b0b}
+.scale{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;margin-top:12px;padding:8px 12px;background:#fbf4de;border:2px solid var(--wood);border-radius:8px;font:700 11.5px var(--disp);letter-spacing:.04em;text-transform:uppercase;color:var(--ink)}
+.scale i{display:inline-block;width:14px;height:14px;border-radius:3px;border:1.5px solid #2d2410;vertical-align:-3px;margin-right:6px}
+.scale em{flex:1 0 100%;font:italic 400 12.5px var(--serif);text-transform:none;letter-spacing:0;color:var(--mute)}
+.card input[type=search]{width:100%;font:14px var(--serif);padding:8px 10px;border:2px solid var(--wood);border-radius:4px;margin-bottom:8px;background:#fbf4de;color:var(--ink)}
+#tbl th{cursor:pointer;user-select:none;white-space:nowrap}
+#tbl th:hover{color:#8f1212}
+#tbl th[aria-sort=ascending]::after{content:" \2191"}
+#tbl th[aria-sort=descending]::after{content:" \2193"}
+#tbl td.n{font-variant-numeric:tabular-nums}
+#tbl tbody tr:hover td,#tbl tbody tr.hl td{background-color:rgba(232,200,114,.5)}
+#tbl tfoot td{font-weight:700;border-top:2px solid var(--wood);border-bottom:0;padding-top:6px}
+#tbl td:first-child{white-space:normal;line-height:1.2}
+#tbl th,#tbl td{padding-left:4px;padding-right:4px}
+#tbl th{font-size:10.5px;letter-spacing:.03em}
+#tip{position:absolute;pointer-events:none;background:var(--wood);color:var(--parch);border:2px solid var(--gold);padding:6px 10px;border-radius:6px;font-size:13px;line-height:1.5;display:none;white-space:nowrap;z-index:2}
+#tip b{font:700 13px var(--disp);letter-spacing:.04em;text-transform:uppercase}
+.i{color:#15803d}.b{color:#7c3aed}.m{color:#2563eb}.y{color:#a16207}
+.card{background:var(--parch);border:3px double var(--wood);border-radius:14px;padding:14px 16px;margin-bottom:18px;box-shadow:0 8px 20px rgba(0,0,0,.45)}
+.tot{display:flex;gap:22px;flex-wrap:wrap}
+.tot div{font-size:13px;color:var(--mute)}.tot b{display:block;font:700 26px var(--disp)}
+.tot div:nth-child(1) b::before{content:"\265F\00a0"}.tot div:nth-child(2) b::before{content:"\265E\00a0"}.tot div:nth-child(3) b::before{content:"\265C\00a0"}.tot div:nth-child(4) b::before{content:"\2694\00a0"}
+.tot b::before{font-size:.8em}
+.tot div{transition:transform .15s}.tot div:hover{transform:translateY(-3px) rotate(-2deg)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;vertical-align:bottom;line-height:1.2;font:700 11.5px var(--disp);letter-spacing:.06em;text-transform:uppercase;color:var(--wood);padding:5px 6px;border-bottom:2px solid var(--wood)}
+th.n,td.n{text-align:right}
+td{padding:4px 6px;border-bottom:1px dotted rgba(74,44,23,.35)}
+td a{color:var(--ink);text-decoration:none;font-weight:700}td a:hover{color:#8f1212;text-decoration:underline}
+.note{font-size:13px;color:#e7d9b3;font-style:italic}
+footer{text-align:center;font-size:12.5px;color:#e7d9b3;padding:0 20px 26px;font-style:italic}
+@media(max-width:820px){main{grid-template-columns:1fr}header img{height:44px}header h1{font-size:16px}.dice{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <img src="assets/logo.png" alt="FISAC CGIL">
+  <div><h1>Filiali Intesa Sanpaolo, BPER e Monte dei Paschi di Siena</h1><p>Mappe per regione: seleziona una regione per vedere le filiali e le sovrapposizioni sul territorio</p></div>
+  <div class="dice" title="Tira i dadi!" role="button" aria-label="Tira i dadi"><div class="die r"><i style="grid-area:1/1"></i><i style="grid-area:1/3"></i><i style="grid-area:2/2"></i><i style="grid-area:3/1"></i><i style="grid-area:3/3"></i></div><div class="die u"><i style="grid-area:1/1"></i><i style="grid-area:2/2"></i><i style="grid-area:3/3"></i></div></div>
+</header>
+<main>
+  <div class="mapbox">
+    <div class="toolbar" role="group" aria-label="Colora la mappa in base a">
+      <button type="button" data-k="tot" aria-pressed="true">Sedi totali</button><button type="button" data-k="o" aria-pressed="false">Comuni con 2+ banche</button><button type="button" data-k="i" aria-pressed="false">Intesa</button><button type="button" data-k="b" aria-pressed="false">BPER</button><button type="button" data-k="m" aria-pressed="false">MPS</button>
+    </div>
+    <svg viewBox="0 0 __W__ __H__" role="img" aria-label="Mappa schematica dell'Italia divisa per regioni">__SVG__</svg>
+    <div class="scale" id="scale"></div>
+    <div id="tip"></div>
+  </div>
+  <div>
+    <div class="card">
+      <div class="tot"><div><b class="i">__TI__</b>Intesa Sanpaolo</div><div><b class="b">__TB__</b>BPER Banca</div><div><b class="m">__TM__</b>Monte dei Paschi</div><div><b class="y">__TO__</b>comuni con 2+ banche</div></div>
+    </div>
+    <div class="card">
+      <input type="search" id="q" placeholder="Cerca una regione" aria-label="Cerca una regione">
+      <table id="tbl"><thead><tr><th>Regione</th><th class="n i">ISP</th><th class="n b">BPER</th><th class="n m">MPS</th><th class="n y">Comuni<br>2+ banche</th></tr></thead><tbody>__ROWS__</tbody></table>
+    </div>
+    <p class="note">Elenco degli sportelli (succursali in Italia, attive) dalla Banca d'Italia, aggiornato al __DATE__. Le posizioni sulle mappe sono ricavate dagli indirizzi e per alcune sedi sono approssimative. Elaborazione prodotta dalla FISAC - CGIL Firenze.</p>
+  </div>
+</main>
+<footer>Elaborazione prodotta dalla FISAC - CGIL Firenze</footer>
+<script>
+const $=s=>document.querySelector(s);
+const PIPS={1:[[2,2]],2:[[1,1],[3,3]],3:[[1,1],[2,2],[3,3]],4:[[1,1],[1,3],[3,1],[3,3]],5:[[1,1],[1,3],[2,2],[3,1],[3,3]],6:[[1,1],[2,1],[3,1],[1,3],[2,3],[3,3]]};
+function roll(){document.querySelectorAll('.die').forEach(d=>{const n=1+Math.floor(Math.random()*6);d.innerHTML=PIPS[n].map(p=>'<i style="grid-area:'+p[0]+'/'+p[1]+'"></i>').join('');d.classList.remove('rolling');void d.offsetWidth;d.classList.add('rolling')})}
+document.querySelector('.dice').addEventListener('click',roll);
+const fmt=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'.');   // migliaia con il punto (anche 1.166)
+const tip=$('#tip'),box=$('.mapbox');
+const regs=[...document.querySelectorAll('a.reg')];
+const HUE={tot:[179,0,27],o:[179,0,27],i:[21,128,61],b:[124,58,237],m:[37,99,235]};
+const UNIT={tot:'sedi',o:'comuni con 2+ banche',i:'sedi Intesa',b:'sedi BPER',m:'sedi MPS'};
+const val=(a,k)=>k==='tot'?(+a.dataset.i)+(+a.dataset.b)+(+a.dataset.m):k==='o'?+a.dataset.o:+a.dataset[k];
+const GR={"Nord-Ovest":['#e58a2e',["Piemonte","Valle d'Aosta","Lombardia","Liguria"]],"Nord-Est":['#9a5fb0',["Trentino-Alto Adige","Veneto","Friuli-Venezia Giulia","Emilia-Romagna"]],"Centro":['#e6c83c',["Toscana","Umbria","Marche","Lazio"]],"Sud":['#6fae3c',["Abruzzo","Molise","Campania","Puglia","Basilicata","Calabria"]],"Isole":['#d9506a',["Sicilia","Sardegna"]]};
+const hex=h=>[1,3,5].map(i=>parseInt(h.substr(i,2),16));
+const mixc=(h,w,t)=>'rgb('+hex(h).map((c,i)=>Math.round(c+(w[i]-c)*t)).join(',')+')';
+const BASE={};Object.values(GR).forEach(([c,ns])=>ns.forEach((n,x)=>{const s=[0,.14,-.12,.07,-.06,.2][x%6];BASE[n]=s>=0?mixc(c,[255,255,255],s):mixc(c,[0,0,0],-s)}));
+const SHORT={"Valle d'Aosta":"V. d'Aosta","Trentino-Alto Adige":"Trentino A.A.","Friuli-Venezia Giulia":"Friuli V.G.","Emilia-Romagna":"Emilia-R."};
+const NS='http://www.w3.org/2000/svg',svg=document.querySelector('.mapbox svg'),ov=svg.appendChild(document.createElementNS(NS,'g'));ov.setAttribute('pointer-events','none');
+const BKC={i:'#15803d',b:'#7c3aed',m:'#2563eb'};
+const byname={};regs.forEach(a=>byname[a.dataset.n]=a);
+const ctr=a=>{const bb=a.querySelector('path').getBBox();return[bb.x+bb.width/2,bb.y+bb.height/2]};
+[["Sardegna","Toscana"],["Sardegna","Lazio"],["Sicilia","Calabria"]].forEach(([p,q])=>{if(!byname[p]||!byname[q])return;const A=ctr(byname[p]),B=ctr(byname[q]),e=document.createElementNS(NS,'line');e.setAttribute('class','conn');e.setAttribute('x1',A[0]);e.setAttribute('y1',A[1]);e.setAttribute('x2',B[0]);e.setAttribute('y2',B[1]);ov.appendChild(e)});
+regs.forEach(a=>{const bb=a.querySelector('path').getBBox(),n=a.dataset.n,cx=bb.x+bb.width/2,cy=bb.y+bb.height/2;
+  const g=document.createElementNS(NS,'g');ov.appendChild(g);a._g=g;
+  const mk=(tag,at)=>{const e=document.createElementNS(NS,tag);for(const k in at)e.setAttribute(k,at[k]);g.appendChild(e);return e};
+  const sync=()=>g.classList.toggle('up',a.matches(':hover')||a.classList.contains('hl'));a.addEventListener('mouseenter',sync);a.addEventListener('mouseleave',sync);new MutationObserver(sync).observe(a,{attributes:true,attributeFilter:['class']});
+  a._c=mk('rect',{class:'pz',x:cx-6,y:cy-21,width:12,height:13,rx:2.5});a._tp=mk('rect',{class:'pzt',x:cx-4.5,y:cy-19.5,width:9,height:3.5,rx:1.5});
+  a._t=mk('text',{class:'lbl',x:cx,y:cy+2});a._n=mk('text',{class:'num',x:cx,y:cy+16});
+  a._t.textContent=bb.width<60?(SHORT[n]||n):n});
+function paint(k){const mx=Math.max(1,...regs.map(a=>val(a,k)));
+  regs.forEach(a=>{const v=val(a,k),t=Math.sqrt(v/mx);a.querySelector('path').style.fill=mixc(BASE[a.dataset.n]?rgb2hex(BASE[a.dataset.n]):'#e8a64a',[255,255,255],.3*(1-t));
+    const dom=BKC[k]?k:['i','b','m'].reduce((x,y)=>(+a.dataset[y])>(+a.dataset[x])?y:x);
+    a._c.setAttribute('fill',BKC[dom]);a._n.textContent=fmt(v)});
+  $('#unit').textContent='Il numero indica: '+UNIT[k]+'. Il colore chiaro/scuro segue la quantità; il pezzo è nel colore della banca con più sedi.';
+  document.querySelectorAll('.toolbar button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===k))}
+function rgb2hex(s){return '#'+s.match(/\d+/g).map(x=>(+x).toString(16).padStart(2,'0')).join('')}
+$('#scale').innerHTML=Object.entries(GR).map(([n,[c]])=>'<span><i style="background:'+c+'"></i>'+n+'</span>').join('')+'<em id="unit"></em>';
+document.querySelectorAll('.toolbar button').forEach(b=>b.onclick=()=>paint(b.dataset.k));
+paint('tot');
+const hover=window.matchMedia('(hover:hover)').matches;
+if(hover)regs.forEach(a=>{
+  const show=e=>{const tt=val(a,'tot');tip.innerHTML='<b>'+a.dataset.n+'</b><br><span style="color:#86efac">ISP '+fmt(a.dataset.i)+'</span> &middot; <span style="color:#c4b5fd">BPER '+fmt(a.dataset.b)+'</span> &middot; <span style="color:#93c5fd">MPS '+fmt(a.dataset.m)+'</span><br>totale '+fmt(tt)+'<br><span style="color:#fde047">comuni con 2+ banche: '+fmt(a.dataset.o)+'</span>';tip.style.display='block';const r=box.getBoundingClientRect();tip.style.left=Math.min(e.clientX-r.left+14,r.width-230)+'px';tip.style.top=(e.clientY-r.top+14)+'px'};
+  a.addEventListener('mousemove',show);a.addEventListener('mouseleave',()=>tip.style.display='none')});
+/* tabella: totale, ordinamento, ricerca, tabella e mappa collegate */
+const tbl=$('#tbl'),tb=tbl.tBodies[0],hr=tbl.tHead.rows[0],rows=[...tb.rows];
+hr.cells[hr.cells.length-1].insertAdjacentHTML('beforebegin','<th class="n">Totale</th>');
+const C=[null,'21,128,61','124,58,237','37,99,235','179,0,27','202,138,4'];
+rows.forEach(tr=>{const c=tr.cells,i=+c[1].textContent,b=+c[2].textContent,m=+c[3].textContent,o=+c[4].textContent;
+  c[4].insertAdjacentHTML('beforebegin','<td class="n">'+fmt(i+b+m)+'</td>');[1,2,3].forEach((j,x)=>c[j].textContent=fmt([i,b,m][x]));c[5].textContent=fmt(o);tr._d=[c[0].textContent,i,b,m,i+b+m,o];tr._slug=c[0].querySelector('a').getAttribute('href')});
+const tf=tbl.createTFoot().insertRow();tf.innerHTML='<td>Italia</td>'+[1,2,3,4,5].map(j=>'<td class="n">'+fmt(rows.reduce((s,r)=>s+r._d[j],0))+'</td>').join('');
+const ths=[...hr.cells];let sk=0,sd=1;
+ths.forEach((th,j)=>th.onclick=()=>{sd=sk===j?-sd:(j?-1:1);sk=j;
+  rows.sort((a,b)=>{const x=a._d[j],y=b._d[j];return (x>y?1:x<y?-1:0)*sd*(j?1:1)}).forEach(r=>tb.appendChild(r));
+  ths.forEach((t,k)=>k===j?t.setAttribute('aria-sort',sd>0?'ascending':'descending'):t.removeAttribute('aria-sort'))});
+$('#q').oninput=e=>{const q=e.target.value.trim().toLowerCase();rows.forEach(r=>r.hidden=!!q&&!r._d[0].toLowerCase().includes(q))};
+const byslug={};regs.forEach(a=>byslug[a.getAttribute('href')]=a);
+rows.forEach(r=>{const a=byslug[r._slug];r.addEventListener('mouseenter',()=>a&&a.classList.add('hl'));r.addEventListener('mouseleave',()=>a&&a.classList.remove('hl'));
+  if(a){a.addEventListener('mouseenter',()=>r.classList.add('hl'));a.addEventListener('mouseleave',()=>r.classList.remove('hl'))}});
+</script>
+</body>
+</html>

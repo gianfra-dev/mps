@@ -140,11 +140,12 @@ for s in summary:
         ds+='M'+'L'.join(f'{x},{y}' for x,y in dpring(ring,0.35))+'Z'
     paths.append((s,ds))
 W=math.ceil((18.8-X0)*K*S);H=math.ceil((Y0-36.55)*S)
-svg=''.join(f'<a href="{s["slug"]}/" class="reg" data-n="{s["name"]}" data-i="{s["n"]["ISP"]}" data-b="{s["n"]["BPER"]}" data-m="{s["n"]["MPS"]}" data-o="{s["k2"]}"><title>{s["name"]}</title><path d="{ds}"/></a>' for s,ds in paths)
+seas=''.join(f'<text class="sea" transform="translate({proj([lo,la])[0]},{proj([lo,la])[1]}) rotate({r})">{n}</text>' for n,lo,la,r in (('Mar Ligure',8.5,43.45,-18),('Mar Tirreno',12.3,39.7,62),('Mar Adriatico',14.7,42.8,48),('Mar Ionio',17.6,38.2,40))) if os.environ.get('LANDING')=='landing_risiko.html' else ''   # nomi dei mari solo per la variante Risiko
+svg=seas+''.join(f'<a href="{s["slug"]}/" class="reg" data-n="{s["name"]}" data-i="{s["n"]["ISP"]}" data-b="{s["n"]["BPER"]}" data-m="{s["n"]["MPS"]}" data-o="{s["k2"]}"><title>{s["name"]}</title><path d="{ds}"/></a>' for s,ds in paths)
 rows=''.join(f'<tr><td><a href="{s["slug"]}/">{s["name"]}</a></td><td class="n i">{s["n"]["ISP"]}</td><td class="n b">{s["n"]["BPER"]}</td><td class="n m">{s["n"]["MPS"]}</td><td class="n y">{s["k2"]}</td></tr>' for s in sorted(summary,key=lambda s:s['name']))
 mil=lambda n:f'{n:,}'.replace(',','.')
 tot=lambda k:sum(s['n'][k] for s in summary)
-html=open(f'{HERE}/landing.html').read()
+html=open(f"{HERE}/{os.environ.get('LANDING','landing.html')}").read()
 for k,v in [('__SVG__',svg),('__W__',str(W)),('__H__',str(H)),('__ROWS__',rows),('__DATE__',TODAY),('__TI__',mil(tot('ISP'))),('__TB__',mil(tot('BPER'))),('__TM__',mil(tot('MPS'))),('__TO__',mil(sum(s['k2'] for s in summary)))]:html=html.replace(k,v)
 open(f'{ROOT}/index.html','w').write(html)
 print('TOTALE',{k:tot(k) for k in('ISP','BPER','MPS')},'comuni 2+',sum(s['k2'] for s in summary))

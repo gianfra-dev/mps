@@ -9,6 +9,24 @@ const dir=read('fxdir');store('fxdir');
 if(!RM.matches)root.classList.add(dir==='back'?'fx-in-back':'fx-in-fwd');
 addEventListener('animationend',e=>{if(e.target===document.body)root.classList.remove('fx-in-fwd','fx-in-back')});
 
+
+/* lancio dei dadi: due dadi 3D rotolano, poi si apre la regione */
+const PIPS={1:[[2,2]],2:[[1,1],[3,3]],3:[[1,1],[2,2],[3,3]],4:[[1,1],[1,3],[3,1],[3,3]],5:[[1,1],[1,3],[2,2],[3,1],[3,3]],6:[[1,1],[2,1],[3,1],[1,3],[2,3],[3,3]]};
+const ROT={1:[0,0],6:[0,180],3:[0,-90],4:[0,90],2:[-90,0],5:[90,0]};   /* [rotX, rotY] che porta la faccia davanti */
+function cube(cls){
+  const n=1+Math.floor(Math.random()*6),[fx,fy]=ROT[n];
+  const faces=[1,2,3,4,5,6].map(k=>'<div class="f f'+k+'">'+PIPS[k].map(p=>'<i style="grid-area:'+p[0]+'/'+p[1]+'"></i>').join('')+'</div>').join('');
+  return '<div class="fx-cube '+cls+'" style="--fx:'+fx+'deg;--fy:'+fy+'deg">'+faces+'</div>';
+}
+function diceLeave(href,name){
+  store('fxdir','fwd');
+  const o=document.createElement('div');o.className='fx-dice';o.setAttribute('aria-hidden','true');
+  o.innerHTML='<div class="pair">'+cube('r')+cube('u')+'</div><div class="name"></div>';
+  o.querySelector('.name').textContent=name;
+  root.appendChild(o);
+  setTimeout(()=>{location.href=href},1650);
+}
+
 /* uscita: la pagina gira via prima di navigare */
 function leave(href,x,y,d){
   store('fxdir',d);
@@ -19,14 +37,15 @@ function leave(href,x,y,d){
 }
 document.addEventListener('click',e=>{
   const a=e.target.closest&&e.target.closest('a[href]');
-  if(!a||e.defaultPrevented||e.button||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||a.target)return;
+  if(!a||e.defaultPrevented||e.button||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||a.getAttribute('target'))return;
   const u=new URL(a.getAttribute('href'),location.href);
   if(u.origin!==location.origin||(u.pathname===location.pathname&&u.hash))return;
   e.preventDefault();
   const r=a.getBoundingClientRect();
+  if(!RM.matches&&!a.classList.contains('back')&&document.querySelector('.mapbox')){diceLeave(u.href,(a.dataset.n||a.textContent).trim());return}
   leave(u.href,r.left+r.width/2,r.top+r.height/2,a.classList.contains('back')?'back':'fwd');
 });
-addEventListener('pageshow',e=>{if(e.persisted)root.classList.remove('fx-out-fwd','fx-out-back')});
+addEventListener('pageshow',e=>{if(e.persisted){root.classList.remove('fx-out-fwd','fx-out-back');document.querySelectorAll('.fx-dice').forEach(d=>d.remove())}});
 
 /* pagina d'accesso */
 const box=document.querySelector('.mapbox');

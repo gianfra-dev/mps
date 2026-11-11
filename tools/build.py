@@ -123,7 +123,7 @@ for R in REG:
     n={k:sum(b['b']==k for b in br) for k in ('ISP','BPER','MPS')}
     print(f"{rname:22} ISP {n['ISP']:4} BPER {n['BPER']:4} MPS {n['MPS']:4} comuni {len(R['cf']):4} 2+:{k2:3} 3:{k3:3}")
     data=json.dumps({'comuni':{'type':'FeatureCollection','features':enc(R['cf'])},'prov':{'type':'FeatureCollection','features':enc(pf)},'br':br},separators=(',',':'),ensure_ascii=False)
-    t=open(f'{HERE}/template.html').read()
+    t=open(f"{HERE}/{os.environ.get('TEMPLATE','template.html')}").read()
     for k,v in [('__REG__',rname),('__DATE__',TODAY),('__PROVN__',json.dumps(R['PROVN'],ensure_ascii=False)),('__SLUG__',slug),('__DATA__',data)]:t=t.replace(k,v)
     os.makedirs(f'{ROOT}/{slug}',exist_ok=True);open(f'{ROOT}/{slug}/index.html','w').write(t)
     summary.append(dict(slug=slug,name=rname,n=n,k2=k2,k3=k3,feat=regf[R['rname']]))
@@ -140,7 +140,7 @@ for s in summary:
         ds+='M'+'L'.join(f'{x},{y}' for x,y in dpring(ring,0.35))+'Z'
     paths.append((s,ds))
 W=math.ceil((18.8-X0)*K*S);H=math.ceil((Y0-36.55)*S)
-seas=''.join(f'<text class="sea" transform="translate({proj([lo,la])[0]},{proj([lo,la])[1]}) rotate({r})">{n}</text>' for n,lo,la,r in (('Mar Ligure',8.5,43.45,-18),('Mar Tirreno',12.3,39.7,62),('Mar Adriatico',14.7,42.8,48),('Mar Ionio',17.6,38.2,40))) if os.environ.get('LANDING')=='landing_risiko.html' else ''   # nomi dei mari solo per la variante Risiko
+seas=''.join(f'<text class="sea" transform="translate({proj([lo,la])[0]},{proj([lo,la])[1]}) rotate({r})">{n}</text>' for n,lo,la,r in (('Mar Ligure',8.5,43.45,-18),('Mar Tirreno',12.3,39.7,62),('Mar Adriatico',14.7,42.8,48),('Mar Ionio',17.6,38.2,40))) if os.environ.get('LANDING') in ('landing_risiko.html','landing_3d.html') else ''   # nomi dei mari solo per la variante Risiko
 svg=seas+''.join(f'<a href="{s["slug"]}/" class="reg" data-n="{s["name"]}" data-i="{s["n"]["ISP"]}" data-b="{s["n"]["BPER"]}" data-m="{s["n"]["MPS"]}" data-o="{s["k2"]}"><title>{s["name"]}</title><path d="{ds}"/></a>' for s,ds in paths)
 rows=''.join(f'<tr><td><a href="{s["slug"]}/">{s["name"]}</a></td><td class="n i">{s["n"]["ISP"]}</td><td class="n b">{s["n"]["BPER"]}</td><td class="n m">{s["n"]["MPS"]}</td><td class="n y">{s["k2"]}</td></tr>' for s in sorted(summary,key=lambda s:s['name']))
 mil=lambda n:f'{n:,}'.replace(',','.')

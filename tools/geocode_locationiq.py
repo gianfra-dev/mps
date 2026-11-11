@@ -14,7 +14,7 @@ prova=int(sys.argv[sys.argv.index('--prova')+1]) if '--prova' in sys.argv else 0
 CACHE=f'{HERE}/data/geocode.json';cache=json.load(open(CACHE))
 def rkey(r):return '|'.join([r['CODICE MECCANOGRAFICO INTERMEDIARIO'],r['CODICE SUCCURSALE'],r['CAP'],r['INDIRIZZO']])
 appr=set(json.load(open(f'{HERE}/data/approssimate.json'))) if os.path.exists(f'{HERE}/data/approssimate.json') else set()
-rows=[r for n in ('intesa','bper','mps') for r in read_csv(f'{HERE}/data/csv/{n}.csv')]
+rows=[r for n in ('intesa','bper','mps','bds') for r in read_csv(f'{HERE}/data/csv/{n}.csv')]
 todo=[r for r in rows if rkey(r) in appr or cache.get(rkey(r)) is None]
 if prova:todo=todo[:prova]
 print('sedi da riprovare:',len(todo),flush=True)

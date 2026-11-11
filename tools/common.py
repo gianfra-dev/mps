@@ -16,5 +16,6 @@ def read_csv(path):
 # comuni nei CSV con il nome precedente a fusioni/rinominazioni -> nome nel dataset dei confini
 ALIAS={'berra':'Riva del Po','carbonaradipo':'Borgocarbonara','coriglianocalabro':'Corigliano-Rossano','rossano':'Corigliano-Rossano','cutigliano':'Abetone Cutigliano','laterina':'Laterina Pergine Valdarno','pergine valdarno':'Laterina Pergine Valdarno','porrettaterme':'Alto Reno Terme','puosdalpago':'Alpago','revere':'Borgo Mantovano','riomarina':'Rio','sandorligodellavalle':'San Dorligo della Valle-Dolina','sangiovannidasso':'Montalcino','sangiovannidifassa':'San Giovanni di Fassa-Sèn Jan','sanmarcellopistoiese':'San Marcello Piteglio','santagostino':'Terre del Reno','sermide':'Sermide e Felonica','sorbolo':'Sorbolo Mezzani','tavarnellevaldipesa':'Barberino Tavarnelle','tresigallo':'Tresignana','vallecrosiaalmare':'Vallecrosia','vermezzo':'Vermezzo con Zelo','acquaricadelcapo':'Presicce-Acquarica','ortiseisanktulrichingroden':'Ortisei/St. Ulrich'}
 ALIAS['perginevaldarno']=ALIAS['laterina']
+ALIAS['gonnosfanadica']='Gonnosfanadiga'   # refuso nel CSV
 def cname(city):
     k=norm(city);return norm(ALIAS[k]) if k in ALIAS else k

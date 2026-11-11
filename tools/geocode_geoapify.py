@@ -11,7 +11,7 @@ if not KEY:sys.exit('Imposta la variabile GEOAPIFY_KEY (chiave gratuita da mypro
 prova=int(sys.argv[sys.argv.index('--prova')+1]) if '--prova' in sys.argv else 0
 CACHE=f'{HERE}/data/geocode.json';cache=json.load(open(CACHE))
 def rkey(r):return '|'.join([r['CODICE MECCANOGRAFICO INTERMEDIARIO'],r['CODICE SUCCURSALE'],r['CAP'],r['INDIRIZZO']])
-rows=[r for n in ('intesa','bper','mps') for r in read_csv(f'{HERE}/data/csv/{n}.csv')]
+rows=[r for n in ('intesa','bper','mps','bds') for r in read_csv(f'{HERE}/data/csv/{n}.csv')]
 todo=[r for r in rows if rkey(r) in cache and cache[rkey(r)] is None]
 if prova:todo=todo[:prova]
 print('da riprovare:',len(todo),flush=True)

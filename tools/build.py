@@ -54,11 +54,11 @@ sys.path.insert(0,HERE)
 from common import read_csv,cname
 GEO=json.load(open(f'{HERE}/data/geocode.json'))
 raw=[]
-for b,fn in (('ISP','intesa'),('BPER','bper'),('MPS','mps')):
+for b,fn in (('ISP','intesa'),('BPER','bper'),('MPS','mps'),('BPER','bds')):   # il Banco di Sardegna (fn='bds') è conteggiato come BPER, marcato con s=1
     for r in read_csv(f'{HERE}/data/csv/{fn}.csv'):
         k='|'.join([r['CODICE MECCANOGRAFICO INTERMEDIARIO'],r['CODICE SUCCURSALE'],r['CAP'],r['INDIRIZZO']]);g=GEO.get(k)
         city=r["CITTA'"].strip().title();fr=r['FRAZIONE'].strip().title()
-        raw.append(dict(k=k,b=b,nome=city+(' – '+fr if fr else ''),ind=tt(r['INDIRIZZO']),cap=r['CAP'],tel='',lat=g[0] if g else None,lon=g[1] if g else None,prec=(g[2] if g else None),comd=r["CITTA'"],provd=None,cod=r['CODICE SUCCURSALE'],tip='Filiale',spec=False,marchio=''))
+        raw.append(dict(k=k,b=b,nome=city+(' – '+fr if fr else ''),ind=tt(r['INDIRIZZO']),cap=r['CAP'],tel='',lat=g[0] if g else None,lon=g[1] if g else None,prec=(g[2] if g else None),comd=r["CITTA'"],provd=None,cod=r['CODICE SUCCURSALE'],tip='Filiale',spec=False,marchio='',s=1 if fn=='bds' else 0))
 print('sedi dai CSV',collections.Counter(r['b'] for r in raw),'senza coordinate',sum(r['lat'] is None for r in raw))
 # ---------- confini ----------
 prov=json.load(open(f'{DATA}/prov.geojson'))['features']
@@ -116,7 +116,7 @@ summary=[]
 for R in REG:
     rname,slug=KEY.get(R['rname'],(R['rname'],re.sub(r'[^a-z]+','-',unicodedata.normalize('NFKD',R['rname'].lower()).encode('ascii','ignore').decode()).strip('-')))
     pf=[{'type':'Feature','properties':{'p':f['properties']['prov_acr'],'n':f['properties']['prov_name']},'geometry':geom(f['geometry'])} for f in prov if f['properties']['reg_name']==R['rname']]
-    br=[{k:v for k,v in b.items() if k not in('k','comd','provd','prec','tel','marchio','spec')} for b in R['br']]
+    br=[{k:v for k,v in b.items() if k not in('k','comd','provd','prec','tel','marchio','spec') and not(k=='s' and not v)} for b in R['br']]
     cnt=collections.defaultdict(set)
     for b in br:cnt[b['com']].add(b['b'])
     k2=sum(len(v)>=2 for v in cnt.values());k3=sum(len(v)==3 for v in cnt.values())
@@ -140,7 +140,8 @@ for s in summary:
         ds+='M'+'L'.join(f'{x},{y}' for x,y in dpring(ring,0.35))+'Z'
     paths.append((s,ds))
 W=math.ceil((18.8-X0)*K*S);H=math.ceil((Y0-36.55)*S)
-svg=''.join(f'<a href="{s["slug"]}/" class="reg" data-n="{s["name"]}" data-i="{s["n"]["ISP"]}" data-b="{s["n"]["BPER"]}" data-m="{s["n"]["MPS"]}" data-o="{s["k2"]}"><title>{s["name"]}</title><path d="{ds}"/></a>' for s,ds in paths)
+seas=''.join(f'<text class="sea" transform="translate({proj([lo,la])[0]},{proj([lo,la])[1]}) rotate({r})">{n}</text>' for n,lo,la,r in (('Mar Ligure',8.5,43.45,-18),('Mar Tirreno',12.3,39.7,62),('Mar Adriatico',14.7,42.8,48),('Mar Ionio',17.6,38.2,40)))
+svg=seas+''.join(f'<a href="{s["slug"]}/" class="reg" data-n="{s["name"]}" data-i="{s["n"]["ISP"]}" data-b="{s["n"]["BPER"]}" data-m="{s["n"]["MPS"]}" data-o="{s["k2"]}"><title>{s["name"]}</title><path d="{ds}"/></a>' for s,ds in paths)
 rows=''.join(f'<tr><td><a href="{s["slug"]}/">{s["name"]}</a></td><td class="n i">{s["n"]["ISP"]}</td><td class="n b">{s["n"]["BPER"]}</td><td class="n m">{s["n"]["MPS"]}</td><td class="n y">{s["k2"]}</td></tr>' for s in sorted(summary,key=lambda s:s['name']))
 mil=lambda n:f'{n:,}'.replace(',','.')
 tot=lambda k:sum(s['n'][k] for s in summary)

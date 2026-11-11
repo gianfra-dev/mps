@@ -9,7 +9,7 @@ HERE=os.path.dirname(os.path.abspath(__file__));sys.path.insert(0,HERE)
 from common import *
 CACHE=f'{HERE}/data/geocode.json';OUT=f'{HERE}/data/da_correggere.csv'
 def rkey(r):return '|'.join([r['CODICE MECCANOGRAFICO INTERMEDIARIO'],r['CODICE SUCCURSALE'],r['CAP'],r['INDIRIZZO']])
-NOMI={'intesa':'Intesa Sanpaolo','bper':'BPER Banca','mps':'Monte dei Paschi'}
+NOMI={'intesa':'Intesa Sanpaolo','bper':'BPER Banca','mps':'Monte dei Paschi','bds':'Banco di Sardegna (BPER)'}
 cache=json.load(open(CACHE))
 if len(sys.argv)<2 or sys.argv[1] not in('esporta','importa'):sys.exit(__doc__)
 if sys.argv[1]=='esporta':
@@ -17,7 +17,7 @@ if sys.argv[1]=='esporta':
     n=0
     with open(OUT,'w',newline='',encoding='utf-8-sig') as f:
         w=csv.writer(f,delimiter=';');w.writerow(['banca','codice_sede','indirizzo','cap','citta','lat','lon','cerca_su_openstreetmap','chiave'])
-        for b in('intesa','bper','mps'):
+        for b in('intesa','bper','mps','bds'):
             for r in read_csv(f'{HERE}/data/csv/{b}.csv'):
                 k=rkey(r)
                 if cache.get(k) and k not in appr:continue

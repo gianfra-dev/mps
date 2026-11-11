@@ -11,7 +11,7 @@ HERE=os.path.dirname(os.path.abspath(__file__));CACHE=f'{HERE}/data/geocode.json
 cache=json.load(open(CACHE)) if os.path.exists(CACHE) else {}
 def rkey(r):return '|'.join([r['CODICE MECCANOGRAFICO INTERMEDIARIO'],r['CODICE SUCCURSALE'],r['CAP'],r['INDIRIZZO']])
 rows=[]
-for n in ('intesa','bper','mps'):rows+= [(n,r) for r in read_csv(f'{HERE}/data/csv/{n}.csv')]
+for n in ('intesa','bper','mps','bds'):rows+= [(n,r) for r in read_csv(f'{HERE}/data/csv/{n}.csv')]
 def num(a):
     m=re.search(r'(\d+)',a or '');return m.group(1) if m else ''
 if len(sys.argv)>1:

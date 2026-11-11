@@ -57,7 +57,7 @@ button.act{border:1px solid var(--line);background:#fff;border-radius:6px;paddin
 .pinfo .t{font-size:15px;font-weight:700}
 .pinfo a{display:block;padding:5px 0;color:#1d4ed8;cursor:pointer;border-top:1px solid #eee}
 td.n{font-variant-numeric:tabular-nums}
-td:first-child{white-space:nowrap}
+td:first-child{white-space:normal;overflow-wrap:anywhere;min-width:7em}
 @media(max-width:820px){#app{grid-template-columns:1fr;grid-template-rows:60vh auto;height:auto;min-height:100%}#map{order:-1;height:60vh}aside{border:0;overflow:visible}.tablewrap{flex:none;max-height:65vh}.legend{font-size:11px;padding:5px 8px;line-height:1.5}}
 </style>
 </head>
@@ -99,7 +99,10 @@ td:first-child{white-space:nowrap}
 <div id="map"></div>
 </div>
 <script>
+const fmt=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
 const D=__DATA__;
+function dec(fc){fc.features.forEach(f=>{f.geometry.coordinates=f.geometry.coordinates.map(p=>p.map(r=>{const o=[];let x=0,y=0;for(let i=0;i<r.length;i+=2){x+=r[i];y+=r[i+1];o.push([x/1e4,y/1e4])}return o}))})}
+dec(D.comuni);dec(D.prov);
 const PROVN=__PROVN__;
 const BK=['ISP','BPER','MPS'];
 const BN={ISP:'Intesa Sanpaolo',BPER:'BPER Banca',MPS:'Monte dei Paschi'};
@@ -142,7 +145,7 @@ function refresh(){
     L.polyline([[a.lat,a.lon],[c.lat,c.lon]],{color:'#dc2626',weight:2.5,opacity:.9}).bindTooltip(`${a.nome} (${a.b}) ↔ ${c.nome} (${c.b}): ${Math.round(d)} m`).addTo(pairLayer)}}
   const all=Object.values(counts),w=all.filter(c=>c.k>0).length,k2=all.filter(c=>c.k>=2).length,k3=all.filter(c=>c.k===3).length;
   const n=k=>act.filter(b=>b.b===k).length;
-  $('stats').innerHTML=BK.map(k=>`<div class=stat><b style="color:${BC[k]}">${n(k)}</b><span>${BN[k]}</span></div>`).join('')+`<div class=stat><b style="color:#ca8a04">${k2}</b><span>comuni con 2+ banche (su ${w})</span></div><div class=stat><b style="color:#ea580c">${k3}</b><span>comuni con tutte e 3</span></div><div class=stat><b style="color:#dc2626">${pairs}</b><span>coppie entro ${R} m (sedi con posizione esatta)</span></div>`;
+  $('stats').innerHTML=BK.map(k=>`<div class=stat><b style="color:${BC[k]}">${fmt(n(k))}</b><span>${BN[k]}</span></div>`).join('')+`<div class=stat><b style="color:#ca8a04">${fmt(k2)}</b><span>comuni con 2+ banche (su ${fmt(w)})</span></div><div class=stat><b style="color:#ea580c">${fmt(k3)}</b><span>comuni con tutte e 3</span></div><div class=stat><b style="color:#dc2626">${fmt(pairs)}</b><span>coppie entro ${R} m (sedi con posizione esatta)</span></div>`;
   comLayer.eachLayer(l=>{});
   renderTable();showInfo($('selProv').value);
 }
@@ -165,7 +168,7 @@ function renderTable(){
   const vis=new Set(rows.map(r=>r.n));
   comLayer.eachLayer(l=>{const n=l.feature.properties.n,c=counts[n];l.setStyle({fillColor:fillOf(c),fillOpacity:vis.has(n)||c.k===0?opOf(c):.03})});
 }
-function row(c){return `<tr class="c${selected===c.n?' sel':''}" data-n="${esc(c.n)}"><td>${esc(c.n)}</td><td>${c.p}</td>${BK.map(k=>`<td class=n${bar(k,c[k])}>${c[k]||''}</td>`).join('')}<td>${stTag(c)}</td></tr>`}
+function row(c){return `<tr class="c${selected===c.n?' sel':''}" data-n="${esc(c.n)}"><td>${esc(c.n).replace(/\//g,"/<wbr>")}</td><td>${c.p}</td>${BK.map(k=>`<td class=n${bar(k,c[k])}>${c[k]||''}</td>`).join('')}<td>${stTag(c)}</td></tr>`}
 function selectComune(n){selected=n;const l=comByName[n];if(!l)return;map.fitBounds(l.getBounds(),{maxZoom:13,padding:[30,30]});
   const c=counts[n],bs=active().filter(b=>b.com===n);
   l.bindPopup(`<div class=pop><b>${esc(n)} (${c.p})</b><div class=m>${BK.map(k=>k+': '+c[k]).join(' · ')}</div>${bs.map(b=>`<div style="color:${BC[b.b]}">● ${esc(b.nome)} <span class=m>– ${esc(b.ind)}</span></div>`).join('')}</div>`,{maxWidth:340}).openPopup(l.getBounds().getCenter());
@@ -185,7 +188,7 @@ info.onAdd=()=>{const d=L.DomUtil.create('div','pinfo');L.DomEvent.disableClickP
 info.addTo(map);
 function showInfo(p){const d=info.getContainer();if(!p){d.style.display='none';return}
   const rows=Object.values(counts).filter(c=>c.p===p&&c.k>0),ov=rows.filter(r=>r.k>=2).sort((x,y)=>(y.k-x.k)||((y.ISP+y.BPER+y.MPS)-(x.ISP+x.BPER+x.MPS)));
-  d.innerHTML=`<button class="x" aria-label="Chiudi">×</button><div class="t">Provincia di ${esc(pn(p))}</div><div>${BK.map(k=>`<span style="color:${BC[k]}">${k} ${rows.reduce((s,r)=>s+r[k],0)}</span>`).join(' · ')} · ${rows.length} comuni con filiali</div><div style="margin:6px 0 2px"><b>Comuni con 2+ banche: ${ov.length}</b></div>${ov.map(r=>`<a data-n="${esc(r.n)}">${esc(r.n)} <span style="color:#667085">(${BK.filter(k=>r[k]).map(k=>k+' '+r[k]).join(' · ')})</span></a>`).join('')||'<div style="color:#667085">Nessuna sovrapposizione</div>'}`;
+  d.innerHTML=`<button class="x" aria-label="Chiudi">×</button><div class="t">Provincia di ${esc(pn(p))}</div><div>${BK.map(k=>`<span style="color:${BC[k]}">${k} ${fmt(rows.reduce((s,r)=>s+r[k],0))}</span>`).join(' · ')} · ${rows.length} comuni con filiali</div><div style="margin:6px 0 2px"><b>Comuni con 2+ banche: ${ov.length}</b></div>${ov.map(r=>`<a data-n="${esc(r.n)}">${esc(r.n)} <span style="color:#667085">(${BK.filter(k=>r[k]).map(k=>k+' '+r[k]).join(' · ')})</span></a>`).join('')||'<div style="color:#667085">Nessuna sovrapposizione</div>'}`;
   d.style.display='block'}
 function selectProvince(p){$('selProv').value=p;renderTable();const ls=[];comLayer.eachLayer(l=>l.feature.properties.p===p&&ls.push(l));if(ls.length)map.fitBounds(L.featureGroup(ls).getBounds(),{padding:[20,20]});showInfo(p)}
 function focusMap(){if(innerWidth>820)return;const r=$('map').getBoundingClientRect();if(r.top<0||r.top>120)window.scrollTo({top:scrollY+r.top,behavior:'smooth'})}

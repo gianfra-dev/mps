@@ -20,7 +20,9 @@ def dp(pts,eps):
 def dpring(r,eps):
     m=len(r)//2
     return (dp(r[:m+1],eps)[:-1]+dp(r[m:],eps)) if len(r)>=8 else r
-def simp(coords,eps=0.0002,nd=4):
+EPS=float(os.environ.get('EPS',0.0002));ND=int(os.environ.get('ND',4))
+def simp(coords,eps=None,nd=None):
+    eps=EPS if eps is None else eps;nd=ND if nd is None else nd
     out=[]
     for ring in coords:
         r=[[round(x,nd),round(y,nd)] for x,y in dpring(ring,eps)];rr=[];last=None
@@ -104,6 +106,12 @@ print('sedi senza comune riconosciuto (scartate):',sum(unm.values()),list(unm.it
 KEY={"Valle d'Aosta/Vallée d'Aoste":("Valle d'Aosta",'valle-d-aosta'),'Trentino-Alto Adige/Südtirol':('Trentino-Alto Adige','trentino-alto-adige')}
 regs=json.load(open(f'{DATA}/g/../regions.geojson'))['features'] if os.path.exists(f'{DATA}/regions.geojson') else json.load(open(f'{HERE}/data/regions.geojson'))['features']
 regf={f['properties']['reg_name']:f for f in regs}
+def encring(r):   # anello -> [x0,y0,dx,dy,...] in interi (1e-4 gradi): molto più compatto; la pagina lo decodifica
+    o=[];px=py=0
+    for x,y in r:
+        X=round(x*1e4);Y=round(y*1e4);o+= [X-px,Y-py];px,py=X,Y
+    return o
+def enc(fs):return [{**f,'geometry':{'type':'MultiPolygon','coordinates':[[encring(r) for r in p] for p in f['geometry']['coordinates']]}} for f in fs]
 summary=[]
 for R in REG:
     rname,slug=KEY.get(R['rname'],(R['rname'],re.sub(r'[^a-z]+','-',unicodedata.normalize('NFKD',R['rname'].lower()).encode('ascii','ignore').decode()).strip('-')))
@@ -114,7 +122,7 @@ for R in REG:
     k2=sum(len(v)>=2 for v in cnt.values());k3=sum(len(v)==3 for v in cnt.values())
     n={k:sum(b['b']==k for b in br) for k in ('ISP','BPER','MPS')}
     print(f"{rname:22} ISP {n['ISP']:4} BPER {n['BPER']:4} MPS {n['MPS']:4} comuni {len(R['cf']):4} 2+:{k2:3} 3:{k3:3}")
-    data=json.dumps({'comuni':{'type':'FeatureCollection','features':R['cf']},'prov':{'type':'FeatureCollection','features':pf},'br':br},separators=(',',':'),ensure_ascii=False)
+    data=json.dumps({'comuni':{'type':'FeatureCollection','features':enc(R['cf'])},'prov':{'type':'FeatureCollection','features':enc(pf)},'br':br},separators=(',',':'),ensure_ascii=False)
     t=open(f'{HERE}/template.html').read()
     for k,v in [('__REG__',rname),('__DATE__',TODAY),('__PROVN__',json.dumps(R['PROVN'],ensure_ascii=False)),('__SLUG__',slug),('__DATA__',data)]:t=t.replace(k,v)
     os.makedirs(f'{ROOT}/{slug}',exist_ok=True);open(f'{ROOT}/{slug}/index.html','w').write(t)
@@ -134,8 +142,9 @@ for s in summary:
 W=math.ceil((18.8-X0)*K*S);H=math.ceil((Y0-36.55)*S)
 svg=''.join(f'<a href="{s["slug"]}/" class="reg" data-n="{s["name"]}" data-i="{s["n"]["ISP"]}" data-b="{s["n"]["BPER"]}" data-m="{s["n"]["MPS"]}" data-o="{s["k2"]}"><title>{s["name"]}</title><path d="{ds}"/></a>' for s,ds in paths)
 rows=''.join(f'<tr><td><a href="{s["slug"]}/">{s["name"]}</a></td><td class="n i">{s["n"]["ISP"]}</td><td class="n b">{s["n"]["BPER"]}</td><td class="n m">{s["n"]["MPS"]}</td><td class="n y">{s["k2"]}</td></tr>' for s in sorted(summary,key=lambda s:s['name']))
+mil=lambda n:f'{n:,}'.replace(',','.')
 tot=lambda k:sum(s['n'][k] for s in summary)
 html=open(f'{HERE}/landing.html').read()
-for k,v in [('__SVG__',svg),('__W__',str(W)),('__H__',str(H)),('__ROWS__',rows),('__DATE__',TODAY),('__TI__',str(tot('ISP'))),('__TB__',str(tot('BPER'))),('__TM__',str(tot('MPS'))),('__TO__',str(sum(s['k2'] for s in summary)))]:html=html.replace(k,v)
+for k,v in [('__SVG__',svg),('__W__',str(W)),('__H__',str(H)),('__ROWS__',rows),('__DATE__',TODAY),('__TI__',mil(tot('ISP'))),('__TB__',mil(tot('BPER'))),('__TM__',mil(tot('MPS'))),('__TO__',mil(sum(s['k2'] for s in summary)))]:html=html.replace(k,v)
 open(f'{ROOT}/index.html','w').write(html)
 print('TOTALE',{k:tot(k) for k in('ISP','BPER','MPS')},'comuni 2+',sum(s['k2'] for s in summary))

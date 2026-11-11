@@ -16,7 +16,7 @@ const ROT={1:[0,0],6:[0,180],3:[0,-90],4:[0,90],2:[-90,0],5:[90,0]};   /* [rotX,
 function cube(cls){
   const n=1+Math.floor(Math.random()*6),[fx,fy]=ROT[n];
   const faces=[1,2,3,4,5,6].map(k=>'<div class="f f'+k+'">'+PIPS[k].map(p=>'<i style="grid-area:'+p[0]+'/'+p[1]+'"></i>').join('')+'</div>').join('');
-  return '<div class="fx-cube '+cls+'" style="--fx:'+fx+'deg;--fy:'+fy+'deg">'+faces+'</div>';
+  return '<div class="fx-cube '+cls+'" data-fx="'+fx+'" data-fy="'+fy+'">'+faces+'</div>';
 }
 function diceLeave(href,name){
   store('fxdir','fwd');
@@ -24,6 +24,18 @@ function diceLeave(href,name){
   o.innerHTML='<div class="pair">'+cube('r')+cube('u')+'</div><div class="name"></div>';
   o.querySelector('.name').textContent=name;
   root.appendChild(o);
+  /* animazione via Web Animations: valori espliciti, nessuna variabile CSS (piu' sicuro su Safari) */
+  o.querySelectorAll('.fx-cube').forEach((c,i)=>{
+    const fx=+c.dataset.fx,fy=+c.dataset.fy,end='rotateX('+fx+'deg) rotateY('+fy+'deg)';
+    const t=(x,y,z,rx,ry)=>'translate3d('+x+','+y+','+z+') rotateX('+(fx+rx)+'deg) rotateY('+(fy+ry)+'deg)';
+    c.style.transform=end;
+    if(c.animate)c.animate([
+      {transform:'translate3d(-30vw,-70vh,-300px) rotateX(0deg) rotateY(0deg)',offset:0},
+      {transform:t('0px','0px','40px',540,720),offset:.55},
+      {transform:t('0px','-9vh','20px',630,810),offset:.72},
+      {transform:t('0px','0px','0px',720,1080),offset:1}],
+      {duration:1000+i*50,delay:100+i*100,easing:'cubic-bezier(.3,.7,.4,1)',fill:'backwards'});
+  });
   setTimeout(()=>{location.href=href},1650);
 }
 

@@ -13,6 +13,7 @@ for p in sorted(glob.glob(f'{SRC}/*/index.html')):
     slug=os.path.basename(os.path.dirname(p))
     if slug in('assets','tools'):continue
     h=open(p,encoding='utf-8').read().replace('../assets/logo.png','@@LOGO@@')
+    if '<a class="back" href="../"' not in h:continue   # salta cartelle che non sono pagine regionali standard
     h=h.replace('<a class="back" href="../"','<a class="back" href="#" onclick="parent.postMessage(\'home\',\'*\');return false"')
     assert 'onclick="parent.postMessage' in h,slug
     blocks.append(f'<script type="text/html" id="r-{slug}">{esc(h)}</script>');slugs.append(slug)

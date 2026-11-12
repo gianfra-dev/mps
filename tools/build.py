@@ -140,7 +140,7 @@ for s in summary:
         ds+='M'+'L'.join(f'{x},{y}' for x,y in dpring(ring,0.35))+'Z'
     paths.append((s,ds))
 W=math.ceil((18.8-X0)*K*S);H=math.ceil((Y0-36.55)*S)
-seas=''.join(f'<text class="sea" transform="translate({proj([lo,la])[0]},{proj([lo,la])[1]}) rotate({r})">{n}</text>' for n,lo,la,r in (('Mar Ligure',8.5,43.45,-18),('Mar Tirreno',12.3,39.7,62),('Mar Adriatico',14.7,42.8,48),('Mar Ionio',17.6,38.2,40))) if os.environ.get('LANDING') in ('landing_risiko.html','landing_3d.html') else ''   # nomi dei mari solo per la variante Risiko
+seas=''.join(f'<text class="sea" transform="translate({proj([lo,la])[0]},{proj([lo,la])[1]}) rotate({r})">{n}</text>' for n,lo,la,r in (('Mar Ligure',8.5,43.45,-18),('Mar Tirreno',12.3,39.7,62),('Mar Adriatico',14.7,42.8,48),('Mar Ionio',17.6,38.2,40))) if os.environ.get('LANDING') in ('landing_3d.html',) else ''   # nomi dei mari solo per la variante con modello alternativo
 svg=seas+''.join(f'<a href="{s["slug"]}/" class="reg" data-n="{s["name"]}" data-i="{s["n"]["ISP"]}" data-b="{s["n"]["BPER"]}" data-m="{s["n"]["MPS"]}" data-o="{s["k2"]}"><title>{s["name"]}</title><path d="{ds}"/></a>' for s,ds in paths)
 rows=''.join(f'<tr><td><a href="{s["slug"]}/">{s["name"]}</a></td><td class="n i">{s["n"]["ISP"]}</td><td class="n b">{s["n"]["BPER"]}</td><td class="n m">{s["n"]["MPS"]}</td><td class="n y">{s["k2"]}</td></tr>' for s in sorted(summary,key=lambda s:s['name']))
 mil=lambda n:f'{n:,}'.replace(',','.')

@@ -101,7 +101,8 @@ for r in raw:
             R['br'].append(r);done=True
     if not done:unm[(r['b'],r['comd'])]+=1
     elif r.get('prec') in ('city',None):approx[r['b']]+=1;r['a']=1
-json.dump(sorted(r['k'] for R in REG for r in R['br'] if r.get('a')),open(f'{HERE}/data/approssimate.json','w'))
+if ROOT==os.path.abspath(os.path.join(HERE,'..')):   # l'elenco delle sedi approssimate si aggiorna solo con la build del sito vero
+    json.dump(sorted(r['k'] for R in REG for r in R['br'] if r.get('a')),open(f'{HERE}/data/approssimate.json','w'))
 print('sedi senza comune riconosciuto (scartate):',sum(unm.values()),list(unm.items())[:12]);print('posizione approssimativa:',dict(approx))
 KEY={"Valle d'Aosta/Vallée d'Aoste":("Valle d'Aosta",'valle-d-aosta'),'Trentino-Alto Adige/Südtirol':('Trentino-Alto Adige','trentino-alto-adige')}
 regs=json.load(open(f'{DATA}/g/../regions.geojson'))['features'] if os.path.exists(f'{DATA}/regions.geojson') else json.load(open(f'{HERE}/data/regions.geojson'))['features']
